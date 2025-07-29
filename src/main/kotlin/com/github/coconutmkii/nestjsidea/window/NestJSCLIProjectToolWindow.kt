@@ -14,7 +14,7 @@ import javax.swing.Icon
 class NestJSCLIProjectToolWindow : GeneratorNewProjectWizard {
     override val id: String = "cli"
     override val icon: Icon = icons.CollaborationToolsIcons.Send
-    override val name: String = NestJSPluginBundle.message("NestJSCLI")
+    override val name: String = NestJSPluginBundle.message("nestjs.cli")
 
     override fun createStep(context: WizardContext): NewProjectWizardStep =
         RootNewProjectWizardStep(context)

@@ -10,6 +10,8 @@
     <resource-bundle>messages.NestJPluginBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
         <moduleBuilder builderClass="com.github.coconutmkii.nestjsidea.window.NestJSCLIProjectToolWindow$Builder"/>
+        <framework.detector implementation="com.github.coconutmkii.nestjsidea.framework.NestJSFrameworkDetector"/>
+        <registryKey defaultValue="true" description="Enables framework detection for NestJS CLI" key="nestjs.detect.cli.configuration"/>
     </extensions>
 
     <applicationListeners>
