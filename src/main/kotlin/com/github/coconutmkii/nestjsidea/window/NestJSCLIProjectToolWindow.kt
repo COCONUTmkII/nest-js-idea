@@ -9,11 +9,12 @@ import com.intellij.ide.wizard.NewProjectWizardChainStep.Companion.nextStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.RootNewProjectWizardStep
 import com.intellij.ide.wizard.newProjectWizardBaseStepWithoutGap
+import com.intellij.openapi.util.IconLoader
 import javax.swing.Icon
 
 class NestJSCLIProjectToolWindow : GeneratorNewProjectWizard {
     override val id: String = "cli"
-    override val icon: Icon = icons.CollaborationToolsIcons.Send
+    override val icon: Icon = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
     override val name: String = NestJSPluginBundle.message("nestjs.cli")
 
     override fun createStep(context: WizardContext): NewProjectWizardStep =
