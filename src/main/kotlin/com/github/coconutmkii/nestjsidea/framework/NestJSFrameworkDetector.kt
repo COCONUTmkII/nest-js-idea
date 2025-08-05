@@ -9,6 +9,8 @@ import com.intellij.framework.detection.FileContentPattern
 import com.intellij.framework.detection.FrameworkDetectionContext
 import com.intellij.framework.detection.FrameworkDetector
 import com.intellij.json.JsonFileType
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
@@ -90,7 +92,7 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
                 item!!.parent.findChild("tmp")?.let {
                     contentEntry -> entry.addExcludeFolder(contentEntry)
                 }
-                createNestRunConfigurations(module.project, item.parent!!)
+                createNestRunConfigurations(module.project)
             }
         }
 
@@ -100,9 +102,13 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
 
         override fun hashCode(): Int = files.hashCode()
 
-        private fun createNestRunConfigurations(project: Project, baseDir: VirtualFile) {
-            // TODO: Implement this properly later
-            println("Would create NestJS CLI run configuration for ${baseDir.path}")
+        private fun createNestRunConfigurations(project: Project) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("NestJS Detected")
+                .createNotification("NestJS project detected",
+                    "To run your app, add an External Tool: npm run start",
+                    NotificationType.INFORMATION)
+                .notify(project)
         }
     }
 }
