@@ -72,7 +72,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         }
 
         override fun getSettings(): Settings {
-            return NestJSStepSetting(super.getSettings(), selectedPackageManager)
+            return NestJSStepSetting(super.getSettings())
         }
 
         override fun isBackgroundJobRunning(): Boolean = false
