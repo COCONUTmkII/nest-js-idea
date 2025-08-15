@@ -5,13 +5,15 @@
     <vendor>coconutmkii</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-
+    <depends>JavaScript</depends>
 
     <resource-bundle>messages.NestJPluginBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
-        <moduleBuilder builderClass="com.github.coconutmkii.nestjsidea.window.NestJSCLIProjectToolWindow$Builder"/>
+        <fileType name="JSON" language="JSON" fileNames="nest-cli.json"/>
+        <directoryProjectGenerator implementation="com.github.coconutmkii.nestjsidea.window.NestJSProjectGenerator"/>
         <framework.detector implementation="com.github.coconutmkii.nestjsidea.framework.NestJSFrameworkDetector"/>
         <registryKey defaultValue="true" description="Enables framework detection for NestJS CLI" key="nestjs.detect.cli.configuration"/>
+        <moduleBuilder builderClass="com.github.coconutmkii.nestjsidea.window.NestJSModuleBuilder" />
         <notificationGroup
                 id="NestJS Detected"
                 displayType="BALLOON"

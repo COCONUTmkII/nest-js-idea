@@ -1,0 +1,6 @@
+package com.github.coconutmkii.nestjsidea.window
+
+import com.intellij.ide.util.projectWizard.WebTemplateNewProjectWizard
+import com.intellij.ide.wizard.GeneratorNewProjectWizardBuilderAdapter
+
+class NestJSModuleBuilder : GeneratorNewProjectWizardBuilderAdapter(WebTemplateNewProjectWizard(NestJSProjectGenerator()))
