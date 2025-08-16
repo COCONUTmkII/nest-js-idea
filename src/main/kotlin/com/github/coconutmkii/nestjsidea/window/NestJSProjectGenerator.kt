@@ -6,6 +6,7 @@ import com.github.coconutmkii.nestjsidea.window.step.NestJSStepSetting
 import com.intellij.execution.filters.Filter
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.lang.javascript.boilerplate.NpmPackageProjectGenerator
+import com.intellij.lang.javascript.boilerplate.NpxPackageDescriptor
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
@@ -17,8 +18,9 @@ import com.intellij.ui.dsl.builder.panel
 import javax.swing.Icon
 import javax.swing.JComponent
 
-//TODO add commands
 class NestJSProjectGenerator : NpmPackageProjectGenerator() {
+    private val packageName = "@nestjs/cli"
+    private val nestCLICommand = "nest"
     override fun getIcon(): Icon? = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
 
     override fun filters(project: Project, baseDir: VirtualFile): Array<out Filter?> = emptyArray()
@@ -31,7 +33,25 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         return NestJSProjectGeneratorPeer()
     }
 
-    override fun packageName(): String = NestJSPluginBundle.message("nestjs.cli.package")
+    override fun getNpxCommands(): List<NpxPackageDescriptor.NpxCommand?> {
+        return listOf(NpxPackageDescriptor.NpxCommand(packageName, nestCLICommand))
+    }
+
+    override fun generatorArgs(
+        project: Project,
+        baseDir: VirtualFile,
+        settings: Settings?,
+    ): Array<out String?> {
+        val selectedManager = if (settings is NestJSStepSetting) {
+            settings.packageManager
+        } else {
+            PackageManager.NPM
+        }
+        val projectName = project.name
+        return arrayOf("new", "--directory", ".", "--package-manager", selectedManager.label, projectName)
+    }
+
+    override fun packageName(): String = packageName
 
     override fun presentablePackageName(): String = NestJSPluginBundle.message("nestjs.presentable.package.name")
 
@@ -72,7 +92,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         }
 
         override fun getSettings(): Settings {
-            return NestJSStepSetting(super.getSettings())
+            return NestJSStepSetting(super.getSettings(), selectedPackageManager)
         }
 
         override fun isBackgroundJobRunning(): Boolean = false
