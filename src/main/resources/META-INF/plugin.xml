@@ -18,6 +18,11 @@
                 id="NestJS Detected"
                 displayType="BALLOON"
                 bundle="messages.NestJPluginBundle" key="notification.group.nestjs.detected"/>
+        <internalFileTemplate name="NestJS Controller"/>
+        <internalFileTemplate name="NestJS Guard"/>
+        <internalFileTemplate name="NestJS Module"/>
+        <internalFileTemplate name="NestJS Pipe"/>
+        <internalFileTemplate name="NestJS Service"/>
     </extensions>
 
     <applicationListeners>
