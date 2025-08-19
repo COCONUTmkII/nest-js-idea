@@ -23,4 +23,10 @@
     <applicationListeners>
 
     </applicationListeners>
+    <actions>
+        <action id="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
+                class="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
+            <add-to-group group-id="NewGroup"/>
+        </action>
+    </actions>
 </idea-plugin>
