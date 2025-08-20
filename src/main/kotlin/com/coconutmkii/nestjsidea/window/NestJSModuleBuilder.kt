@@ -1,4 +1,4 @@
-package com.github.coconutmkii.nestjsidea.window
+package com.coconutmkii.nestjsidea.window
 
 import com.intellij.ide.util.projectWizard.WebTemplateNewProjectWizard
 import com.intellij.ide.wizard.GeneratorNewProjectWizardBuilderAdapter

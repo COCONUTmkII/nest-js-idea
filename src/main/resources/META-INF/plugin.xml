@@ -1,6 +1,6 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.coconutmkii.nestjssupport</id>
+    <id>com.coconutmkii.nestjssupport</id>
     <name>Nest-Js-Support</name>
     <vendor>coconutmkii</vendor>
 
@@ -10,15 +10,15 @@
     <resource-bundle>messages.NestJPluginBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="JSON" language="JSON" fileNames="nest-cli.json"/>
-        <directoryProjectGenerator implementation="com.github.coconutmkii.nestjsidea.window.NestJSProjectGenerator"/>
-        <framework.detector implementation="com.github.coconutmkii.nestjsidea.framework.NestJSFrameworkDetector"/>
+        <directoryProjectGenerator implementation="com.coconutmkii.nestjsidea.window.NestJSProjectGenerator"/>
+        <framework.detector implementation="com.coconutmkii.nestjsidea.framework.NestJSFrameworkDetector"/>
         <registryKey defaultValue="true" description="Enables framework detection for NestJS CLI" key="nestjs.detect.cli.configuration"/>
-        <moduleBuilder builderClass="com.github.coconutmkii.nestjsidea.window.NestJSModuleBuilder" />
+        <moduleBuilder builderClass="com.coconutmkii.nestjsidea.window.NestJSModuleBuilder" />
         <notificationGroup
                 id="NestJS Detected"
                 displayType="BALLOON"
                 bundle="messages.NestJPluginBundle" key="notification.group.nestjs.detected"/>
-        <fileIconProvider implementation="com.github.coconutmkii.nestjsidea.framework.file.NestJsFileIconProvider"/>
+        <fileIconProvider implementation="com.coconutmkii.nestjsidea.framework.file.NestJsFileIconProvider"/>
         <internalFileTemplate name="NestJS Controller"/>
         <internalFileTemplate name="NestJS Guard"/>
         <internalFileTemplate name="NestJS Module"/>
@@ -30,8 +30,8 @@
 
     </applicationListeners>
     <actions>
-        <action id="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
-                class="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
+        <action id="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
+                class="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
             <add-to-group group-id="NewWebDevelopment" relative-to-action="NewTypeScriptFile" anchor="after"/>
         </action>
     </actions>

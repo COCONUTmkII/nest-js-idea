@@ -1,6 +1,6 @@
-package com.github.coconutmkii.nestjsidea.framework
+package com.coconutmkii.nestjsidea.framework
 
-import com.github.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSPluginBundle
 import com.intellij.framework.FrameworkType
 import com.intellij.openapi.util.IconLoader
 import javax.swing.Icon

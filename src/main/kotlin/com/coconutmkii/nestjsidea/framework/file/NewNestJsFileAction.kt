@@ -1,6 +1,6 @@
-package com.github.coconutmkii.nestjsidea.framework.file
+package com.coconutmkii.nestjsidea.framework.file
 
-import com.github.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSPluginBundle
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate

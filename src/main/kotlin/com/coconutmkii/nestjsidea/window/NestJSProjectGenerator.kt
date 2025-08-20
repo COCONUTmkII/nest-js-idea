@@ -1,8 +1,8 @@
-package com.github.coconutmkii.nestjsidea.window
+package com.coconutmkii.nestjsidea.window
 
-import com.github.coconutmkii.nestjsidea.NestJSPluginBundle
-import com.github.coconutmkii.nestjsidea.framework.manager.PackageManager
-import com.github.coconutmkii.nestjsidea.window.step.NestJSStepSetting
+import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.framework.manager.PackageManager
+import com.coconutmkii.nestjsidea.window.step.NestJSStepSetting
 import com.intellij.execution.filters.Filter
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.lang.javascript.boilerplate.NpmPackageProjectGenerator

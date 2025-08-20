@@ -1,4 +1,4 @@
-package com.github.coconutmkii.nestjsidea.util
+package com.coconutmkii.nestjsidea.util
 
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.vfs.VirtualFile

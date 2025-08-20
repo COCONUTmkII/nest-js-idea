@@ -1,9 +1,9 @@
-package com.github.coconutmkii.nestjsidea.services
+package com.coconutmkii.nestjsidea.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSPluginBundle
 
 @Service(Service.Level.PROJECT)
 class NestJSBundleService(project: Project) {

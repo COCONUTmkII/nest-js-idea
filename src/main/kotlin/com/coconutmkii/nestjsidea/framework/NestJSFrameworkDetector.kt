@@ -1,8 +1,8 @@
-package com.github.coconutmkii.nestjsidea.framework
+package com.coconutmkii.nestjsidea.framework
 
-import com.github.coconutmkii.nestjsidea.NestJSPluginBundle
-import com.github.coconutmkii.nestjsidea.util.isNestJsonFile
-import com.github.coconutmkii.nestjsidea.util.isProbableLibraryFile
+import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.util.isNestJsonFile
+import com.coconutmkii.nestjsidea.util.isProbableLibraryFile
 import com.intellij.framework.FrameworkType
 import com.intellij.framework.detection.DetectedFrameworkDescription
 import com.intellij.framework.detection.FileContentPattern

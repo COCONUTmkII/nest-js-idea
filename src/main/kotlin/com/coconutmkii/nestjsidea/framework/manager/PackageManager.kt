@@ -1,4 +1,4 @@
-package com.github.coconutmkii.nestjsidea.framework.manager
+package com.coconutmkii.nestjsidea.framework.manager
 
 enum class PackageManager(val label: String) {
     NPM("npm"),

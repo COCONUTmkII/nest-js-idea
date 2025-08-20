@@ -1,4 +1,4 @@
-package com.github.coconutmkii.nestjsidea
+package com.coconutmkii.nestjsidea
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
