@@ -6,9 +6,12 @@ import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.fileTemplates.FileTemplateUtil
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.NonNls
@@ -29,6 +32,19 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
     private val moduleIcon = IconLoader.getIcon("/icons/moduleIcon.svg", NewNestJsFileAction::class.java)
     private val pipeIcon = IconLoader.getIcon("/icons/pipeIcon.svg", NewNestJsFileAction::class.java)
     private val guardIcon = IconLoader.getIcon("/icons/guardIcon.svg", NewNestJsFileAction::class.java)
+
+    override fun isAvailable(dataContext: DataContext): Boolean {
+        val project: Project = CommonDataKeys.PROJECT.getData(dataContext) ?: return false
+        val dir: PsiDirectory? = CommonDataKeys.PSI_ELEMENT.getData(dataContext) as? PsiDirectory
+            ?: CommonDataKeys.VIRTUAL_FILE.getData(dataContext)?.let { vf ->
+                com.intellij.psi.PsiManager.getInstance(project).findDirectory(vf)
+            }
+
+        if (dir == null) return false
+
+        return isNestProject(dir)
+    }
+
     override fun buildDialog(
         project: Project,
         directory: PsiDirectory,
@@ -76,5 +92,12 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
     private fun toKebabCase(input: String): String = input
         .replace(Regex("([a-z])([A-Z])"), "$1-$2")
         .lowercase()
+
+    private fun isNestProject(directory: PsiDirectory): Boolean {
+        val basePath = directory.project.basePath ?: return false
+        val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
+        val text = String(packageJson.contentsToByteArray())
+        return text.contains("@nestjs/core")
+    }
 
 }
