@@ -1,6 +1,7 @@
 package com.coconutmkii.nestjsidea.framework.file
 
 import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate
@@ -56,6 +57,7 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
             .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.module"), moduleIcon, MODULE_TEMPLATE)
             .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.pipe"), pipeIcon, PIPE_TEMPLATE)
             .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.guard"), guardIcon, GUARD_TEMPLATE)
+            .setValidator(NoWhitespaceValidator())
     }
 
     override fun getActionName(
@@ -68,7 +70,12 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
 
     override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile? {
         val extension = ".ts"
-        val baseName = name.removeSuffix("Controller")
+
+        val cleanName = name
+            .trim()
+            .replace("\\s+".toRegex(), "")
+
+        val baseName = cleanName.removeSuffix("Controller")
             .removeSuffix("Service")
             .removeSuffix("Module")
             .removeSuffix("Pipe")
