@@ -32,7 +32,7 @@
     <actions>
         <action id="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
                 class="com.github.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
-            <add-to-group group-id="NewGroup"/>
+            <add-to-group group-id="NewWebDevelopment" relative-to-action="NewTypeScriptFile" anchor="after"/>
         </action>
     </actions>
 </idea-plugin>
