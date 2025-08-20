@@ -18,6 +18,7 @@
                 id="NestJS Detected"
                 displayType="BALLOON"
                 bundle="messages.NestJPluginBundle" key="notification.group.nestjs.detected"/>
+        <fileIconProvider implementation="com.github.coconutmkii.nestjsidea.framework.file.NestJsFileIconProvider"/>
         <internalFileTemplate name="NestJS Controller"/>
         <internalFileTemplate name="NestJS Guard"/>
         <internalFileTemplate name="NestJS Module"/>
