@@ -2,7 +2,6 @@ package com.coconutmkii.nestjsidea.window
 
 import com.coconutmkii.nestjsidea.NestJSPluginBundle
 import com.coconutmkii.nestjsidea.framework.manager.PackageManager
-import com.coconutmkii.nestjsidea.window.step.NestJSStepSetting
 import com.intellij.execution.filters.Filter
 import com.intellij.ide.util.projectWizard.SettingsStep
 import com.intellij.lang.javascript.boilerplate.NpmPackageProjectGenerator
@@ -11,6 +10,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.util.IconLoader
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.ProjectGeneratorPeer
@@ -21,6 +21,7 @@ import javax.swing.JComponent
 class NestJSProjectGenerator : NpmPackageProjectGenerator() {
     private val packageName = "@nestjs/cli"
     private val nestCLICommand = "nest"
+    protected val packageManagerSetupKey = Key.create<PackageManager>("nestjs.package.manager.setup")
     override fun getIcon(): Icon? = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
 
     override fun filters(project: Project, baseDir: VirtualFile): Array<out Filter?> = emptyArray()
@@ -42,11 +43,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         baseDir: VirtualFile,
         settings: Settings?,
     ): Array<out String?> {
-        val selectedManager = if (settings is NestJSStepSetting) {
-            settings.packageManager
-        } else {
-            PackageManager.NPM
-        }
+        val selectedManager = settings?.getUserData(packageManagerSetupKey) ?: PackageManager.NPM
         val projectName = project.name
         return arrayOf("new", "--directory", ".", "--package-manager", selectedManager.label, projectName)
     }
@@ -92,7 +89,9 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         }
 
         override fun getSettings(): Settings {
-            return NestJSStepSetting(super.getSettings(), selectedPackageManager)
+            val settings = super.getSettings()
+            settings.putUserData(packageManagerSetupKey, selectedPackageManager)
+            return settings
         }
 
         override fun isBackgroundJobRunning(): Boolean = false
