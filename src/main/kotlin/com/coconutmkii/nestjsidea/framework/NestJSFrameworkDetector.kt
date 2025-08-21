@@ -1,14 +1,17 @@
 package com.coconutmkii.nestjsidea.framework
 
 import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.util.addDefaultNestExcludes
+import com.coconutmkii.nestjsidea.util.createNestRunConfigurations
 import com.coconutmkii.nestjsidea.util.isNestJsonFile
-import com.coconutmkii.nestjsidea.util.isProbableLibraryFile
+import com.intellij.ide.projectView.actions.MarkRootActionBase
 import com.intellij.framework.FrameworkType
 import com.intellij.framework.detection.DetectedFrameworkDescription
 import com.intellij.framework.detection.FileContentPattern
 import com.intellij.framework.detection.FrameworkDetectionContext
 import com.intellij.framework.detection.FrameworkDetector
 import com.intellij.json.JsonFileType
+import com.intellij.lang.javascript.library.JSLibraryUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileTypes.FileType
@@ -39,7 +42,7 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
             })
         ).with(object : PatternCondition<FileContent>("notLibrary") {
             override fun accepts(content: FileContent, context: ProcessingContext): Boolean {
-                return !isProbableLibraryFile(content.file)
+                return !JSLibraryUtil.isProbableLibraryFile(content.file)
             }
         })
     }
@@ -86,13 +89,16 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
             for (module in modulesProvider.modules) {
                 val model = modifiableModelsProvider.getModuleModifiableModel(module)
                 val item = files.firstOrNull()
-                val entry = model.contentEntries.find {
-                    it.file != null && VfsUtilCore.isAncestor(it.file!!, item!!, false)
-                } ?: continue
-                item!!.parent.findChild("tmp")?.let {
-                    contentEntry -> entry.addExcludeFolder(contentEntry)
+                val entry = if (item != null) MarkRootActionBase.findContentEntry(model, item) else null
+                if (entry == null) {
+                    modifiableModelsProvider.disposeModuleModifiableModel(model)
+                    continue
                 }
-                createNestRunConfigurations(module.project)
+                entry.addDefaultNestExcludes(item!!.parent)
+                modifiableModelsProvider.commitModuleModifiableModel(model)
+                for (vf in files) {
+                    createNestRunConfigurations(module.project, vf.parent)
+                }
             }
         }
 
@@ -101,14 +107,5 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
         }
 
         override fun hashCode(): Int = files.hashCode()
-
-        private fun createNestRunConfigurations(project: Project) {
-            NotificationGroupManager.getInstance()
-                .getNotificationGroup("NestJS Detected")
-                .createNotification("NestJS project detected",
-                    "To run your app, add an External Tool: npm run start",
-                    NotificationType.INFORMATION)
-                .notify(project)
-        }
     }
 }

@@ -19,9 +19,11 @@ import javax.swing.Icon
 import javax.swing.JComponent
 
 class NestJSProjectGenerator : NpmPackageProjectGenerator() {
+    val packageManagerSetupKey = Key.create<PackageManager>("nestjs.package.manager.setup")
+
     private val packageName = "@nestjs/cli"
     private val nestCLICommand = "nest"
-    protected val packageManagerSetupKey = Key.create<PackageManager>("nestjs.package.manager.setup")
+
     override fun getIcon(): Icon? = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
 
     override fun filters(project: Project, baseDir: VirtualFile): Array<out Filter?> = emptyArray()
