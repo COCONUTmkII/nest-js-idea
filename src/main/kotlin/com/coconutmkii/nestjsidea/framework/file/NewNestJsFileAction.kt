@@ -1,6 +1,11 @@
 package com.coconutmkii.nestjsidea.framework.file
 
-import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSBundle
+import com.coconutmkii.nestjsidea.NestJSIcons.controllerIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.guardIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
 import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
@@ -28,11 +33,6 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
     "Create a new NestJS file",
     IconLoader.getIcon("/icons/nestjsIcon.png", NewNestJsFileAction::class.java),
 ) {
-    private val controllerIcon = IconLoader.getIcon("/icons/controllerIcon.svg", NewNestJsFileAction::class.java)
-    private val serviceIcon = IconLoader.getIcon("/icons/serviceIcon.svg", NewNestJsFileAction::class.java)
-    private val moduleIcon = IconLoader.getIcon("/icons/moduleIcon.svg", NewNestJsFileAction::class.java)
-    private val pipeIcon = IconLoader.getIcon("/icons/pipeIcon.svg", NewNestJsFileAction::class.java)
-    private val guardIcon = IconLoader.getIcon("/icons/guardIcon.svg", NewNestJsFileAction::class.java)
 
     override fun isAvailable(dataContext: DataContext): Boolean {
         val project: Project = CommonDataKeys.PROJECT.getData(dataContext) ?: return false
@@ -51,12 +51,12 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
         directory: PsiDirectory,
         builder: CreateFileFromTemplateDialog.Builder
     ) {
-        builder.setTitle(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file"))
-            .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.controller"), controllerIcon, CONTROLLER_TEMPLATE)
-            .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.service"), serviceIcon, SERVICE_TEMPLATE)
-            .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.module"), moduleIcon, MODULE_TEMPLATE)
-            .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.pipe"), pipeIcon, PIPE_TEMPLATE)
-            .addKind(NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file.guard"), guardIcon, GUARD_TEMPLATE)
+        builder.setTitle(NestJSBundle.message("nestjs.dialog.title.new.nest.file"))
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.controller"), controllerIcon, CONTROLLER_TEMPLATE)
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.service"), serviceIcon, SERVICE_TEMPLATE)
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.module"), moduleIcon, MODULE_TEMPLATE)
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.pipe"), pipeIcon, PIPE_TEMPLATE)
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.guard"), guardIcon, GUARD_TEMPLATE)
             .setValidator(NoWhitespaceValidator())
     }
 
@@ -65,7 +65,7 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
         newName: @NonNls String,
         templateName: @NonNls String?
     ): @NlsContexts.Command String? {
-        return NestJSPluginBundle.message("nestjs.dialog.title.new.nest.file", arrayOf(newName))
+        return NestJSBundle.message("nestjs.dialog.title.new.nest.file", arrayOf(newName))
     }
 
     override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile? {

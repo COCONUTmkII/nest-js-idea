@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.NestJPluginBundle"
+private const val BUNDLE = "messages.NestJSBundle"
 
-object NestJSPluginBundle : DynamicBundle(BUNDLE) {
+object NestJSBundle : DynamicBundle(BUNDLE) {
 
     @JvmStatic
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =

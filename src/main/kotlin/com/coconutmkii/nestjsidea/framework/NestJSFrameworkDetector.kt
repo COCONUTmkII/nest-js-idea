@@ -1,6 +1,6 @@
 package com.coconutmkii.nestjsidea.framework
 
-import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSBundle
 import com.coconutmkii.nestjsidea.util.addDefaultNestExcludes
 import com.coconutmkii.nestjsidea.util.createNestRunConfigurations
 import com.coconutmkii.nestjsidea.util.isNestJsonFile
@@ -12,8 +12,6 @@ import com.intellij.framework.detection.FrameworkDetectionContext
 import com.intellij.framework.detection.FrameworkDetector
 import com.intellij.json.JsonFileType
 import com.intellij.lang.javascript.library.JSLibraryUtil
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
@@ -28,7 +26,6 @@ import com.intellij.patterns.StandardPatterns
 import com.intellij.util.ProcessingContext
 import com.intellij.util.indexing.FileContent
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.openapi.vfs.VfsUtilCore
 
 class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
     override fun getFileType(): FileType = JsonFileType.INSTANCE
@@ -61,12 +58,14 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
 
     private fun isConfigured(files: Collection<VirtualFile>, project: Project?): Boolean {
         if (project == null) return false
+
         for (file in files) {
             val module = ModuleUtilCore.findModuleForFile(file, project)
             if (module != null) {
-                val tmpDir = file.parent.findChild("tmp")
-                if (tmpDir != null && ModuleRootManager.getInstance(module).excludeRoots.contains(tmpDir)) {
-                    return true
+                for (root in ModuleRootManager.getInstance(module).excludeRootUrls) {
+                    if (root == file.parent.url + "/dist") {
+                        return true
+                    }
                 }
             }
         }
@@ -78,7 +77,7 @@ class NestJSFrameworkDetector : FrameworkDetector(NestJSFramework.ID) {
     private inner class NestJSCLIFrameworkDescription(private val files: Collection<VirtualFile>) : DetectedFrameworkDescription() {
         override fun getRelatedFiles(): Collection<VirtualFile?> = files
 
-        override fun getSetupText(): @NlsContexts.Label String = NestJSPluginBundle.message("nestjs.cli")
+        override fun getSetupText(): @NlsContexts.Label String = NestJSBundle.message("nestjs.cli")
 
         override fun getDetector(): FrameworkDetector = this@NestJSFrameworkDetector
 

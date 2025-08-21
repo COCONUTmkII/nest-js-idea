@@ -1,13 +1,13 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.coconutmkii.nestjssupport</id>
-    <name>Nest-Js-Support</name>
+    <name>NestJS Support</name>
     <vendor>coconutmkii</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>JavaScript</depends>
 
-    <resource-bundle>messages.NestJPluginBundle</resource-bundle>
+    <resource-bundle>messages.NestJSBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="JSON" language="JSON" fileNames="nest-cli.json"/>
         <directoryProjectGenerator implementation="com.coconutmkii.nestjsidea.window.NestJSProjectGenerator"/>
@@ -17,7 +17,7 @@
         <notificationGroup
                 id="NestJS Detected"
                 displayType="BALLOON"
-                bundle="messages.NestJPluginBundle" key="notification.group.nestjs.detected"/>
+                bundle="messages.NestJSBundle" key="notification.group.nestjs.detected"/>
         <fileIconProvider implementation="com.coconutmkii.nestjsidea.framework.file.NestJsFileIconProvider"/>
         <codeFoldingOptionsProvider id="NestJSFoldingDefaultsSetter" provider="com.coconutmkii.nestjsidea.framework.file.NestJSFoldingDefaultsSetter"/>
         <internalFileTemplate name="NestJS Controller"/>

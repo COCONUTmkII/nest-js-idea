@@ -1,6 +1,6 @@
 package com.coconutmkii.nestjsidea.window
 
-import com.coconutmkii.nestjsidea.NestJSPluginBundle
+import com.coconutmkii.nestjsidea.NestJSBundle
 import com.coconutmkii.nestjsidea.framework.manager.PackageManager
 import com.intellij.execution.filters.Filter
 import com.intellij.ide.util.projectWizard.SettingsStep
@@ -52,13 +52,13 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
 
     override fun packageName(): String = packageName
 
-    override fun presentablePackageName(): String = NestJSPluginBundle.message("nestjs.presentable.package.name")
+    override fun presentablePackageName(): String = NestJSBundle.message("nestjs.presentable.package.name")
 
-    override fun getDescription(): @NlsContexts.DetailedDescription String? = NestJSPluginBundle.message("nestjs.cli.description")
+    override fun getDescription(): @NlsContexts.DetailedDescription String? = NestJSBundle.message("nestjs.cli.description")
 
-    override fun getName(): @NlsContexts.Label String = NestJSPluginBundle.message("nestjs.cli")
+    override fun getName(): @NlsContexts.Label String = NestJSBundle.message("nestjs.cli")
 
-    override fun getId(): String? = NestJSPluginBundle.message("nestjs.cli")
+    override fun getId(): String? = NestJSBundle.message("nestjs.cli")
 
     private fun ContentEntry.addDefaultNestJSExcludes(baseDir: VirtualFile) {
         addExcludeFolder("${baseDir.url}/dist")
@@ -70,7 +70,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         val property = propertyGraph.property(selectedPackageManager)
         override fun getComponent(): JComponent {
             return panel {
-                row("Package manager") {
+                row {
                     segmentedButton(
                         items = listOf(PackageManager.NPM, PackageManager.YARN, PackageManager.PNPM),
                         renderer = {
@@ -87,7 +87,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
 
         override fun buildUI(settingStep: SettingsStep) {
             super.buildUI(settingStep)
-            settingStep.addSettingsComponent(component)
+            settingStep.addSettingsField("Package manager:", component)
         }
 
         override fun getSettings(): Settings {
