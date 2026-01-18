@@ -12,7 +12,7 @@ import com.intellij.util.text.SemVer
 
 class NestJSSchematicOptionsTextField(
     project: Project,
-    options: List<String>, // может поменять на что-то конкретное типа интерфейса
+    options: List<String>,
     cliVersion: SemVer
 ) : TextFieldWithAutoCompletion<String>(project, NestJSSchematicOptionsCompletionProvider(options, cliVersion), false, null) {
     private class NestJSSchematicOptionsCompletionProvider(
@@ -20,7 +20,7 @@ class NestJSSchematicOptionsTextField(
         private val cliVersion: SemVer
     ) : TextFieldWithAutoCompletionListProvider<String>(options) {
         override fun getLookupString(item: String): String {
-            return getCliParamText(item, cliVersion) // return item.name?.let { AngularCliUtil.getCliParamText(it, cliVersion) } ?: ""
+            return getCliParamText(item, cliVersion)
         }
 
         override fun acceptChar(c: Char): CharFilter.Result? {

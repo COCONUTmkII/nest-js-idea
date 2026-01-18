@@ -1,6 +1,6 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# nest-js-idea Changelog
+# nest-js-framework-support Changelog
 
 ## [Unreleased]
 ### Added

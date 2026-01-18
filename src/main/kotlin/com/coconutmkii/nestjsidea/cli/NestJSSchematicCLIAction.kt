@@ -67,7 +67,7 @@ class NestJSSchematicCLIAction() : DumbAwareAction(nestIcon) {
         val cliVersion = getNestCliPackageVersion(cli)
 
         if (cliVersion == null) {
-            notifyNestCLIWasNotFound()
+            notifyNestCLIWasNotFound(project)
             return
         }
 
@@ -182,7 +182,10 @@ class NestJSSchematicCLIAction() : DumbAwareAction(nestIcon) {
         NpmPackageProjectGenerator.generate(
             interpreter,
             NodePackage(module.virtualFile?.path!!),
-            { kek -> kek.findBinFile("nest", null)?.path.toString() }, //might be a buggy
+            { module ->
+                module.findBinFile("nest", null)?.path
+                    ?: throw IllegalStateException("Nest CLI binary not found")
+            },
             cli,
             VfsUtilCore.virtualToIoFile(workingDir ?: cli),
             project,
