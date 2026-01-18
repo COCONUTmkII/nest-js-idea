@@ -21,7 +21,6 @@
         <notificationGroup displayType="BALLOON" id="NestCLINotFound" bundle="messages.NestJSBundle"
                            key="notification.group.nestjs.cli.not.found"/>
         <fileIconProvider implementation="com.coconutmkii.nestjsidea.framework.file.NestJSFileIconProvider"/>
-        <codeFoldingOptionsProvider id="NestJSFoldingDefaultsSetter" provider="com.coconutmkii.nestjsidea.framework.file.NestJSFoldingDefaultsSetter"/>
         <internalFileTemplate name="NestJS Controller"/>
         <internalFileTemplate name="NestJS Guard"/>
         <internalFileTemplate name="NestJS Module"/>

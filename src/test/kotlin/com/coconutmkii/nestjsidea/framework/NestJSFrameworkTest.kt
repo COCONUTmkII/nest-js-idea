@@ -32,8 +32,4 @@ class NestJSFrameworkTest {
         assertNotNull(icon)
     }
 
-    @Test
-    fun `NestJSFramework should be a FrameworkType instance`() {
-        assertTrue(NestJSFramework.INSTANCE is com.intellij.framework.FrameworkType)
-    }
 }

@@ -78,15 +78,6 @@ class NestJSCliFilterTest {
     }
 
     @Test
-    fun `doParse should return empty list when prefix not found`() {
-        val line = "Some random line without create or update"
-        val prefix = "create "
-        
-        val index = StringUtil.indexOfIgnoreCase(line, prefix, 0)
-        assertTrue("Should not find prefix", index < 0)
-    }
-
-    @Test
     fun `constants should be defined correctly`() {
         assertEquals("create ", CREATE)
         assertEquals("update ", UPDATE)

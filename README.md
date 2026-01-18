@@ -25,7 +25,6 @@ Features:
 - NestJS CLI schematic integration
 - Custom file icons for NestJS files
 - Project and module generators
-- Code folding defaults for NestJS projects
 
 This plugin enhances your development experience with NestJS by providing intelligent code generation, project scaffolding, and IDE integration.
 <!-- Plugin description end -->

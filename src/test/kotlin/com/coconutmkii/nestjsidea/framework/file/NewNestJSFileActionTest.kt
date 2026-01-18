@@ -7,10 +7,7 @@ class NewNestJSFileActionTest {
 
     @Test
     fun `toKebabCase should convert camelCase to kebab-case`() {
-        val action = NewNestJsFileAction()
-        
-        // Access private method via reflection or test helper
-        // For now, test the logic directly
+        NewNestJsFileAction()
         
         fun toKebabCase(input: String): String = input
             .replace(Regex("([a-z])([A-Z])"), "$1-$2")
