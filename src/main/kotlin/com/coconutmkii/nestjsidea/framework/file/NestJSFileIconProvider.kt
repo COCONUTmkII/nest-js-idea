@@ -11,7 +11,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.ide.FileIconProvider
 import javax.swing.Icon
 
-class NestJsFileIconProvider : FileIconProvider {
+class NestJSFileIconProvider : FileIconProvider {
 
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
         if (file.isDirectory) return null

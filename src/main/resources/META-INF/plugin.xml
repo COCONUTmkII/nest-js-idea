@@ -18,7 +18,8 @@
                 id="NestJS Detected"
                 displayType="BALLOON"
                 bundle="messages.NestJSBundle" key="notification.group.nestjs.detected"/>
-        <fileIconProvider implementation="com.coconutmkii.nestjsidea.framework.file.NestJsFileIconProvider"/>
+        <notificationGroup displayType="BALLOON" id="NestCLINotFound"/>
+        <fileIconProvider implementation="com.coconutmkii.nestjsidea.framework.file.NestJSFileIconProvider"/>
         <codeFoldingOptionsProvider id="NestJSFoldingDefaultsSetter" provider="com.coconutmkii.nestjsidea.framework.file.NestJSFoldingDefaultsSetter"/>
         <internalFileTemplate name="NestJS Controller"/>
         <internalFileTemplate name="NestJS Guard"/>
@@ -33,6 +34,10 @@
     <actions>
         <action id="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
                 class="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
+            <add-to-group group-id="NewWebDevelopment" relative-to-action="NewTypeScriptFile" anchor="after"/>
+        </action>
+        <action id="com.coconutmkii.nestjsidea.cli.NestJSSchematicCLIAction"
+                class="com.coconutmkii.nestjsidea.cli.NestJSSchematicCLIAction" text="NestJS Schematic">
             <add-to-group group-id="NewWebDevelopment" relative-to-action="NewTypeScriptFile" anchor="after"/>
         </action>
     </actions>
