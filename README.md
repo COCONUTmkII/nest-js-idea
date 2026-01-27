@@ -1,8 +1,8 @@
 # nest-js-framework-support
 
 ![Build](https://github.com/COCONUTmkII/nest-js-idea/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/29823.svg)](https://plugins.jetbrains.com/plugin/29823)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/29823.svg)](https://plugins.jetbrains.com/plugin/29823)
 
 <!-- Plugin description -->
 NestJS Support plugin provides comprehensive IDE support for NestJS projects.
