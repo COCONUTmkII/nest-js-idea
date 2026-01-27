@@ -13,7 +13,9 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDirectory
 import com.intellij.util.text.SemVer
 import org.jetbrains.annotations.NonNls
 
@@ -133,3 +135,16 @@ private fun createIfNoSimilar(
     }
 }
 
+fun isNestProject(directory: PsiDirectory): Boolean {
+    val basePath = directory.project.basePath ?: return false
+    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
+    val text = String(packageJson.contentsToByteArray())
+    return text.contains("@nestjs/core")
+}
+
+fun isNestProject(project: Project): Boolean {
+    val basePath = project.basePath ?: return false
+    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
+    val text = String(packageJson.contentsToByteArray())
+    return text.contains("@nestjs/core")
+}

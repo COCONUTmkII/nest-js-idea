@@ -4,6 +4,7 @@ import com.coconutmkii.nestjsidea.NestJSBundle
 import com.intellij.execution.configurations.CommandLineTokenizer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.LabeledComponent
 import com.intellij.ui.EditorTextField
 import com.intellij.util.text.SemVer
 import java.awt.BorderLayout
@@ -28,7 +29,8 @@ class NestJSSchematicOptionsDialog(
             add(JLabel(schematic.description), BorderLayout.NORTH)
         }
         editor = NestJSSchematicOptionsTextField(project, schematic.options, cliVersion)
-        panel.add(editor, BorderLayout.CENTER)
+        editor.setPreferredWidth(250)
+        panel.add(LabeledComponent.create(editor, NestJSBundle.message("nestjs.dialog.schematic.options.usage")), BorderLayout.SOUTH)
         return panel
     }
 

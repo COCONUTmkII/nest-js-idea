@@ -7,6 +7,7 @@ import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
 import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
+import com.coconutmkii.nestjsidea.util.isNestProject
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate
@@ -17,7 +18,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.NlsContexts
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.NonNls
@@ -99,12 +99,5 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
     private fun toKebabCase(input: String): String = input
         .replace(Regex("([a-z])([A-Z])"), "$1-$2")
         .lowercase()
-
-    private fun isNestProject(directory: PsiDirectory): Boolean {
-        val basePath = directory.project.basePath ?: return false
-        val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
-        val text = String(packageJson.contentsToByteArray())
-        return text.contains("@nestjs/core")
-    }
 
 }

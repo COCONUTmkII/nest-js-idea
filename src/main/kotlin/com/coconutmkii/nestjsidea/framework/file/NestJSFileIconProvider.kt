@@ -5,6 +5,7 @@ import com.coconutmkii.nestjsidea.NestJSIcons.guardIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
+import com.coconutmkii.nestjsidea.util.isNestProject
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.fileTypes.FileTypeManager
@@ -16,7 +17,7 @@ class NestJSFileIconProvider : FileIconProvider {
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
         if (file.isDirectory) return null
 
-        // only care about TypeScript files
+        if (project == null || !isNestProject(project)) return null
         val tsFileType = FileTypeManager.getInstance().getFileTypeByExtension("ts")
         if (file.fileType != tsFileType) return null
 
