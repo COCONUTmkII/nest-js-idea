@@ -1,8 +1,8 @@
 package com.coconutmkii.nestjsidea.services
 
-import com.coconutmkii.nestjsidea.index.TS_CLASS_TOKENS
 import com.coconutmkii.nestjsidea.util.NESTJS_COMMON_PACKAGE
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
+import com.intellij.lang.javascript.JSStubElementTypes
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.StubSafe
@@ -19,6 +19,7 @@ import com.intellij.openapi.util.text.StringUtil.contains
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
+import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil.getContextOfType
 import com.intellij.psi.util.PsiTreeUtil.getStubChildrenOfTypeAsList
 import com.intellij.util.asSafely
@@ -27,6 +28,10 @@ import com.intellij.util.asSafely
 object NestJSDecoratorService {
     const val CONTROLLER_DECORATOR = "Controller"
     const val MODULE_DECORATOR = "Module"
+    val TS_CLASS_TOKENS = TokenSet.create(
+        JSStubElementTypes.TYPESCRIPT_CLASS,
+        JSStubElementTypes.TYPESCRIPT_CLASS_EXPRESSION
+    )
 
     @JvmStatic
     @StubSafe
