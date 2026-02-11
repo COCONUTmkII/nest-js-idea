@@ -1,0 +1,29 @@
+<html>
+<body>
+<p>Detects NestJS controllers that are not provided in any module.</p>
+
+<p>This inspection helps identify controllers that are decorated with <code>@Controller</code> but are not listed in the <code>controllers</code> array of any NestJS module. Such controllers will not be instantiated by the framework and may cause runtime errors.</p>
+
+<p>Example:</p>
+<pre><code>
+import { Controller } from '@nestjs/common';
+
+@Controller()
+export class MyController {
+  // ...
+}
+// If MyController is not added to any module's controllers array, it will be flagged by this inspection.
+</code></pre>
+
+<p>To fix this, ensure the controller is included in the <code>controllers</code> array of a module, e.g.:</p>
+<pre><code>
+import { Module } from '@nestjs/common';
+import { MyController } from './my.controller';
+
+@Module({
+  controllers: [MyController],
+})
+export class MyModule {}
+</code></pre>
+</body>
+</html>

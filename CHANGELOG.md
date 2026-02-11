@@ -20,3 +20,7 @@
 ### Fixed
 - Bug when nest icons were appearing in non-nest projects
 - Added missing schematic label
+
+## [0.0.3] - 2026-02-11
+### Added
+- Inspection for controllers to check do they exist in any module
