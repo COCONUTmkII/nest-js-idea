@@ -2,7 +2,6 @@ package com.coconutmkii.nestjsidea.services
 
 import com.coconutmkii.nestjsidea.util.NESTJS_COMMON_PACKAGE
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
-import com.intellij.lang.javascript.JSStubElementTypes
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.StubSafe
@@ -19,7 +18,6 @@ import com.intellij.openapi.util.text.StringUtil.contains
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
-import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil.getContextOfType
 import com.intellij.psi.util.PsiTreeUtil.getStubChildrenOfTypeAsList
 import com.intellij.util.asSafely
@@ -28,10 +26,6 @@ import com.intellij.util.asSafely
 object NestJSDecoratorService {
     const val CONTROLLER_DECORATOR = "Controller"
     const val MODULE_DECORATOR = "Module"
-    val TS_CLASS_TOKENS = TokenSet.create(
-        JSStubElementTypes.TYPESCRIPT_CLASS,
-        JSStubElementTypes.TYPESCRIPT_CLASS_EXPRESSION
-    )
 
     @JvmStatic
     @StubSafe
@@ -79,11 +73,20 @@ object NestJSDecoratorService {
 
     @JvmStatic
     fun getClassForDecoratorElement(element: PsiElement?): TypeScriptClass? {
-        val decorator = element.asSafely<ES6Decorator>() ?: getContextOfType(element, ES6Decorator::class.java, false)
+        val decorator = element.asSafely<ES6Decorator>()
+        ?: getContextOfType(element, ES6Decorator::class.java, false)
         ?: return null
+
         val owner = getContextOfType(decorator, JSAttributeListOwner::class.java) ?: return null
-        return owner.asSafely<TypeScriptClass>() ?: JSStubBasedPsiTreeUtil.getChildrenByType(owner, TS_CLASS_TOKENS)
-            .firstOrNull() as? TypeScriptClass
+
+        owner.asSafely<TypeScriptClass>()?.let { return it }
+
+        val stubBasedResult = (owner as? StubBasedPsiElement<*>)?.stub
+            ?.childrenStubs?.firstNotNullOfOrNull { it.psi as? TypeScriptClass }
+
+        if (stubBasedResult != null) return stubBasedResult
+
+        return owner.children.filterIsInstance<TypeScriptClass>().firstOrNull()
     }
 
     private fun hasImportFromNestJSCommonPackage(name: String, file: PsiFile): Boolean =
