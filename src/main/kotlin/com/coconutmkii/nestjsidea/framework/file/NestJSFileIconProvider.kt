@@ -5,6 +5,7 @@ import com.coconutmkii.nestjsidea.NestJSIcons.guardIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.resolverIcon
 import com.coconutmkii.nestjsidea.util.isNestProject
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -29,6 +30,7 @@ class NestJSFileIconProvider : FileIconProvider {
             name.endsWith(".module.ts") -> moduleIcon
             name.endsWith(".pipe.ts") -> pipeIcon
             name.endsWith(".guard.ts") -> guardIcon
+            name.endsWith(".resolver.ts") -> resolverIcon
             else -> null
         }
     }

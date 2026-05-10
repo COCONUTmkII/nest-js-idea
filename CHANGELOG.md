@@ -24,3 +24,11 @@
 ## [0.0.3] - 2026-02-11
 ### Added
 - Inspection for controllers to check do they exist in any module
+
+##[0.0.4] - 2026-05-10
+### Added
+- Support for intellij products 2026
+- Added suport for graphql resolvers in file creation
+### Fixed
+- Renamed plugin name to fit the requirements
+- Fixed stub errors and optimized stub search

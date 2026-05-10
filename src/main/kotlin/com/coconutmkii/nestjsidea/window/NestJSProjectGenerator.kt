@@ -24,27 +24,27 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
     private val packageName = "@nestjs/cli"
     private val nestCLICommand = "nest"
 
-    override fun getIcon(): Icon? = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
+    override fun getIcon(): Icon = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
 
-    override fun filters(project: Project, baseDir: VirtualFile): Array<out Filter?> = emptyArray()
+    override fun filters(project: Project, baseDir: VirtualFile): Array<Filter> = emptyArray()
 
     override fun customizeModule(baseDir: VirtualFile, entry: ContentEntry?) {
         entry?.addDefaultNestJSExcludes(baseDir)
     }
 
-    override fun createPeer(): ProjectGeneratorPeer<Settings?> {
+    override fun createPeer(): ProjectGeneratorPeer<Settings> {
         return NestJSProjectGeneratorPeer()
     }
 
-    override fun getNpxCommands(): List<NpxPackageDescriptor.NpxCommand?> {
+    override fun getNpxCommands(): List<NpxPackageDescriptor.NpxCommand> {
         return listOf(NpxPackageDescriptor.NpxCommand(packageName, nestCLICommand))
     }
 
     override fun generatorArgs(
         project: Project,
         baseDir: VirtualFile,
-        settings: Settings?,
-    ): Array<out String?> {
+        settings: Settings,
+    ): Array<String> {
         val selectedManager = settings?.getUserData(packageManagerSetupKey) ?: PackageManager.NPM
         val projectName = project.name
         return arrayOf("new", "--directory", ".", "--package-manager", selectedManager.label, projectName)

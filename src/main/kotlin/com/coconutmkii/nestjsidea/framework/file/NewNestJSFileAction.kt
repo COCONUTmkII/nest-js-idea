@@ -5,6 +5,7 @@ import com.coconutmkii.nestjsidea.NestJSIcons.controllerIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.guardIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
+import com.coconutmkii.nestjsidea.NestJSIcons.resolverIcon
 import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
 import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
 import com.coconutmkii.nestjsidea.util.isNestProject
@@ -27,6 +28,7 @@ const val SERVICE_TEMPLATE = "NestJS Service"
 const val MODULE_TEMPLATE = "NestJS Module"
 const val PIPE_TEMPLATE = "NestJS Pipe"
 const val GUARD_TEMPLATE = "NestJS Guard"
+const val RESOLVER_TEMPLATE = "NestJS Resolver"
 
 class NewNestJsFileAction : CreateFileFromTemplateAction(
     "NestJS File",
@@ -56,6 +58,7 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
             .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.service"), serviceIcon, SERVICE_TEMPLATE)
             .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.module"), moduleIcon, MODULE_TEMPLATE)
             .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.pipe"), pipeIcon, PIPE_TEMPLATE)
+            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.resolver"), resolverIcon, RESOLVER_TEMPLATE)
             .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.guard"), guardIcon, GUARD_TEMPLATE)
             .setValidator(NoWhitespaceValidator())
     }

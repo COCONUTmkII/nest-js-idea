@@ -15,53 +15,150 @@ import com.intellij.lang.javascript.psi.stubs.JSClassIndex
 import com.intellij.lang.javascript.psi.util.JSUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil.getStubChildrenOfTypeAsList
 
 @Service
 object NestJSModuleService {
 
-    fun findAllNestModules(project: Project): List<TypeScriptClass> {
+    private val MODULES_CACHE_KEY =
+        Key.create<CachedValue<List<TypeScriptClass>>>(
+            "nestjs.modules.cache"
+        )
+
+    fun findAllNestModules(
+        project: Project
+    ): List<TypeScriptClass> = CachedValuesManager
+        .getManager(project)
+        .getCachedValue(
+            project,
+            MODULES_CACHE_KEY,
+            {
+                CachedValueProvider.Result.create(
+                    findAllNestModulesInternal(project),
+                    PsiModificationTracker.MODIFICATION_COUNT
+                )
+            },
+            false
+        )
+
+    private fun findAllNestModulesInternal(
+        project: Project
+    ): List<TypeScriptClass> {
+
         val scope = GlobalSearchScope.projectScope(project)
+
+        /*
+         * IMPORTANT:
+         * We must NOT call JSClassIndex.getElements()
+         * inside processAllKeys().
+         *
+         * Otherwise IntelliJ throws:
+         *
+         * IllegalStateException:
+         * Nesting processElements call under other
+         * stub index operation can lead to a deadlock.
+         */
+        val keys = mutableListOf<String>()
+
+        StubIndex.getInstance().processAllKeys(
+            JSClassIndex.KEY,
+            project
+        ) { key ->
+            keys += key
+            true
+        }
+
         val result = mutableListOf<TypeScriptClass>()
-        StubIndex.getInstance().processAllKeys(JSClassIndex.KEY, project) { key ->
-            val elements = JSClassIndex.getElements(key, project, scope)
-            for (el in elements) {
-                val clazz = el as? TypeScriptClass ?: continue
-                if (findNestDecorator(clazz, "Module") != null) {
+
+        for (key in keys) {
+            val elements = JSClassIndex.getElements(
+                key,
+                project,
+                scope
+            )
+
+            for (element in elements) {
+                val clazz = element as? TypeScriptClass
+                    ?: continue
+
+                if (findNestDecorator(clazz, MODULE_DECORATOR) != null) {
                     result += clazz
                 }
             }
-            true
         }
+
         return result
     }
 
     @JvmStatic
     @StubSafe
-    fun isClassImportedInAnyModule(clazz: TypeScriptClass, project: Project): Boolean {
+    fun isClassImportedInAnyModule(
+        clazz: TypeScriptClass,
+        project: Project
+    ): Boolean {
+
+        val targetClassName = clazz.name ?: return false
+
         val allModules = findAllNestModules(project)
 
         for (module in allModules) {
+
             val decorator = module.attributeList
-                ?.let { getStubChildrenOfTypeAsList(it, ES6Decorator::class.java) }
-                ?.firstOrNull { isNestSupportedDecorator(it, MODULE_DECORATOR) }
+                ?.let {
+                    getStubChildrenOfTypeAsList(
+                        it,
+                        ES6Decorator::class.java
+                    )
+                }
+                ?.firstOrNull {
+                    isNestSupportedDecorator(
+                        it,
+                        MODULE_DECORATOR
+                    )
+                }
                 ?: continue
 
-            val initializer = getObjectLiteralInitializer(decorator) ?: continue
-            val importsArray = initializer.findProperty(CONTROLLERS_PROVIDER)?.initializer
-            if (importsArray != null && arrayContainsClass(importsArray, clazz)) {
+            val initializer =
+                getObjectLiteralInitializer(decorator)
+                    ?: continue
+
+            val controllersArray = initializer
+                .findProperty(CONTROLLERS_PROVIDER)
+                ?.initializer
+                ?: continue
+
+            if (arrayContainsClass(controllersArray, targetClassName)) {
                 return true
             }
         }
+
         return false
     }
 
-    fun arrayContainsClass(expr: JSExpression, clazz: TypeScriptClass): Boolean {
-        val arrayExpr = JSUtils.unparenthesize(expr) as? JSArrayLiteralExpression ?: return false
-        return arrayExpr.expressions.any {
-            (it as? JSReferenceExpression)?.resolve() == clazz
+    private fun arrayContainsClass(
+        expression: JSExpression,
+        targetClassName: String
+    ): Boolean {
+
+        val arrayExpression =
+            JSUtils.unparenthesize(expression)
+                    as? JSArrayLiteralExpression
+                ?: return false
+
+        return arrayExpression.expressions.any { expr ->
+
+            val reference =
+                expr as? JSReferenceExpression
+                    ?: return@any false
+
+            reference.referenceName == targetClassName
         }
     }
 }
