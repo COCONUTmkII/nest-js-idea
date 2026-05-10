@@ -18,6 +18,7 @@ class NewNestJSFileActionTest {
         assertEquals("app-module", toKebabCase("AppModule"))
         assertEquals("auth-guard", toKebabCase("AuthGuard"))
         assertEquals("validation-pipe", toKebabCase("ValidationPipe"))
+        assertEquals("user-resolver", toKebabCase("UserResolver"))
     }
 
     @Test
@@ -67,5 +68,6 @@ class NewNestJSFileActionTest {
         assertEquals("NestJS Module", MODULE_TEMPLATE)
         assertEquals("NestJS Pipe", PIPE_TEMPLATE)
         assertEquals("NestJS Guard", GUARD_TEMPLATE)
+        assertEquals("NestJS Resolver", RESOLVER_TEMPLATE)
     }
 }

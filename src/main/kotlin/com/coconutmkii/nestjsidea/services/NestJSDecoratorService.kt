@@ -41,11 +41,28 @@ object NestJSDecoratorService {
     }
 
     @JvmStatic
-    fun isNestSupportedDecorator(decorator: ES6Decorator, name: String): Boolean {
-        val decoratorName = decorator.decoratorName ?: return false
-        return (contains(decoratorName, name) && (getClassForDecoratorElement(decorator)?.attributeList?.hasModifier(
-            JSAttributeList.ModifierType.ABSTRACT
-        ) != true)) && hasImportFromNestJSCommonPackage(decoratorName, decorator.containingFile)
+    fun isNestSupportedDecorator(
+        decorator: ES6Decorator,
+        name: String
+    ): Boolean {
+
+        val decoratorName =
+            decorator.decoratorName
+                ?: return false
+
+        return (
+                decoratorName == name &&
+                        (
+                                getClassForDecoratorElement(decorator)
+                                    ?.attributeList
+                                    ?.hasModifier(JSAttributeList.ModifierType.ABSTRACT)
+                                        != true
+                                ) &&
+                        hasImportFromNestJSCommonPackage(
+                            decoratorName,
+                            decorator.containingFile
+                        )
+                )
     }
 
     @StubSafe
