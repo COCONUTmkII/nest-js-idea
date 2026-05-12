@@ -83,6 +83,7 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
             .removeSuffix("Module")
             .removeSuffix("Pipe")
             .removeSuffix("Guard")
+            .removeSuffix("Resolver")
 
         val fileName = when (template.name) {
             CONTROLLER_TEMPLATE -> "${toKebabCase(baseName)}.controller$extension"
@@ -90,6 +91,7 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
             MODULE_TEMPLATE -> "${toKebabCase(baseName)}.module$extension"
             PIPE_TEMPLATE -> "${toKebabCase(baseName)}.pipe$extension"
             GUARD_TEMPLATE -> "${toKebabCase(baseName)}.guard$extension"
+            RESOLVER_TEMPLATE -> "${toKebabCase(baseName)}.resolver$extension"
             else -> "$name$extension"
         }
 
