@@ -32,3 +32,7 @@
 ### Fixed
 - Renamed plugin name to fit the requirements
 - Fixed stub errors and optimized stub search
+
+##[0.0.5] - 2026-05-12
+### Fixed
+- Fixed resolver file creation
