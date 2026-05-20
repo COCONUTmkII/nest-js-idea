@@ -36,3 +36,7 @@
 ##[0.0.5] - 2026-05-12
 ### Fixed
 - Fixed resolver file creation
+
+##[0.0.6] - 2026-05-20
+### Added
+- Support for intellij platforms 2026.2
