@@ -14,7 +14,6 @@ import com.intellij.lang.javascript.psi.util.JSStubBasedPsiTreeUtil
 import com.intellij.lang.javascript.psi.util.JSUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.util.text.StringUtil.contains
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
@@ -22,12 +21,9 @@ import com.intellij.psi.util.PsiTreeUtil.getContextOfType
 import com.intellij.psi.util.PsiTreeUtil.getStubChildrenOfTypeAsList
 import com.intellij.util.asSafely
 
-@Service
-object NestJSDecoratorService {
-    const val CONTROLLER_DECORATOR = "Controller"
-    const val MODULE_DECORATOR = "Module"
+@Service(Service.Level.PROJECT)
+class NestJSDecoratorService {
 
-    @JvmStatic
     @StubSafe
     fun findNestDecorator(attributeListOwner: JSAttributeListOwner, name: String): ES6Decorator? {
         val list = attributeListOwner.attributeList
@@ -40,7 +36,6 @@ object NestJSDecoratorService {
             ?.let { findNestDecorator(it, name) }
     }
 
-    @JvmStatic
     fun isNestSupportedDecorator(
         decorator: ES6Decorator,
         name: String
@@ -66,7 +61,6 @@ object NestJSDecoratorService {
     }
 
     @StubSafe
-    @JvmStatic
     fun getObjectLiteralInitializer(
         decorator: ES6Decorator?
     ): JSObjectLiteralExpression? {
@@ -88,7 +82,6 @@ object NestJSDecoratorService {
         return null
     }
 
-    @JvmStatic
     fun getClassForDecoratorElement(element: PsiElement?): TypeScriptClass? {
         val decorator = element.asSafely<ES6Decorator>()
         ?: getContextOfType(element, ES6Decorator::class.java, false)
