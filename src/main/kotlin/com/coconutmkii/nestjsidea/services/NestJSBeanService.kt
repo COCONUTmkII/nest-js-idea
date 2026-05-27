@@ -1,25 +1,21 @@
 package com.coconutmkii.nestjsidea.services
 
-import com.intellij.lang.javascript.psi.StubSafe
+import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
+import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
+import com.intellij.lang.javascript.psi.JSExpression
+import com.intellij.lang.javascript.psi.JSReferenceExpression
+import com.intellij.lang.javascript.psi.JSSpreadExpression
+import com.intellij.lang.javascript.psi.JSVariable
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
+import com.intellij.lang.javascript.psi.util.JSUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-enum class NestJSBeanType(val normilizedName: String) {
-    MODULE("module"),
-    CONTROLLER("controller"),
-    SERVICE("service"),
-    GUARD("guard"),
-    PIPE("pipe"),
-    RESOLVER("resolver"),
-}
-
 @Service(Service.Level.PROJECT)
 class NestJSBeanService {
 
-    @StubSafe
-    fun checkDoesBeanIsUsedInAnyModule(
+    fun isNestJsBeanReferenced(
         clazz: TypeScriptClass,
         project: Project,
         beanType: NestJSBeanType
@@ -30,31 +26,13 @@ class NestJSBeanService {
 
         return when (beanType) {
             NestJSBeanType.MODULE -> {
-                true
+                moduleService.isModuleUsedAnywhere(clazz, allModules)
             }
             NestJSBeanType.CONTROLLER -> {
                 val controllerService = project.service<NestJSControllerService>()
-                allModules.forEach { module ->
-
-                    val dynamic =
-                        controllerService.isControllerDeclaredInDynamicModule(
-                            module,
-                            targetClassName
-                        )
-
-                    val static =
-                        controllerService.isControllerDeclaredInStaticModule(
-                            module,
-                            targetClassName
-                        )
-
-                    val result = dynamic || static
-
-                    if (result) {
-                        return true
-                    }
+                allModules.any { module ->
+                    controllerService.isControllerDeclared(module, targetClassName)
                 }
-                false
             }
             NestJSBeanType.SERVICE -> {
                 true
@@ -71,4 +49,46 @@ class NestJSBeanService {
         }
     }
 
+    fun resolveArrayElements(
+        expression: JSExpression
+    ): Set<String> {
+        val result = mutableSetOf<String>()
+        when (val unwrapped = JSUtils.unparenthesize(expression)) {
+            is JSArrayLiteralExpression -> {
+                unwrapped.expressions.forEach { element ->
+                    when (element) {
+                        is JSReferenceExpression -> {
+                            // [A]
+                            element.referenceName?.let {
+                                result.add(it)
+                            }
+
+                            // [...BASE]
+                            val resolved = element.resolve()
+                            val variable = resolved as? JSVariable
+                            val initializer = variable?.initializer
+
+                            if (initializer != null) {
+                                result.addAll(resolveArrayElements(initializer))
+                            }
+                        }
+                        is JSSpreadExpression -> {
+                            val inner = element.expression ?: return@forEach
+                            result.addAll(resolveArrayElements(inner))
+                        }
+                    }
+                }
+            }
+
+            is JSReferenceExpression -> {
+                // controllers
+                val resolved = unwrapped.resolve()
+                val variable = resolved as? JSVariable ?: return emptySet()
+                val initializer = variable.initializer ?: return emptySet()
+                result.addAll(resolveArrayElements(initializer))
+            }
+        }
+
+        return result
+    }
 }

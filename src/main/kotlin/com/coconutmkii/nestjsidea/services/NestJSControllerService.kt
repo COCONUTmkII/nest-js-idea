@@ -1,5 +1,6 @@
 package com.coconutmkii.nestjsidea.services
 
+import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
 import com.coconutmkii.nestjsidea.util.CONTROLLERS_PROVIDER
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
 import com.intellij.lang.javascript.psi.JSExpression
@@ -21,7 +22,9 @@ import com.intellij.psi.util.PsiTreeUtil.getStubChildrenOfTypeAsList
 @Service(Service.Level.PROJECT)
 class NestJSControllerService {
 
-    @StubSafe
+    fun isControllerDeclared(module: TypeScriptClass, targetClassName: String): Boolean =
+        isControllerDeclaredInStaticModule(module, targetClassName) || isControllerDeclaredInDynamicModule(module, targetClassName)
+
     fun isControllerDeclaredInStaticModule(
         module: TypeScriptClass,
         targetClassName: String
@@ -57,7 +60,6 @@ class NestJSControllerService {
         )
     }
 
-    @StubSafe
     fun isControllerDeclaredInDynamicModule(
         module: TypeScriptClass,
         targetClassName: String
@@ -108,55 +110,10 @@ class NestJSControllerService {
         objectLiteral: JSObjectLiteralExpression
     ): Boolean = objectLiteral.findProperty(NestJSBeanType.MODULE.normilizedName) != null
 
-    private fun resolveArrayElements(
-        expression: JSExpression
-    ): Set<String> {
-        val result = mutableSetOf<String>()
-        when (val unwrapped = JSUtils.unparenthesize(expression)) {
-            is JSArrayLiteralExpression -> {
-                unwrapped.expressions.forEach { element ->
-                    when (element) {
-                        is JSReferenceExpression -> {
-                            // [A]
-                            element.referenceName?.let {
-                                result.add(it)
-                            }
-
-                            // [...BASE]
-                            val resolved =
-                                element.resolve()
-
-                            val variable = resolved as? JSVariable
-
-                            val initializer = variable?.initializer
-
-                            if (initializer != null) {
-                                result.addAll(resolveArrayElements(initializer))
-                            }
-                        }
-
-                        is JSSpreadExpression -> {
-                            val inner = element.expression ?: return@forEach
-                            result.addAll(resolveArrayElements(inner))
-                        }
-                    }
-                }
-            }
-
-            is JSReferenceExpression -> {
-                // controllers
-                val resolved = unwrapped.resolve()
-                val variable = resolved as? JSVariable ?: return emptySet()
-                val initializer = variable.initializer ?: return emptySet()
-                result.addAll(resolveArrayElements(initializer))
-            }
-        }
-
-        return result
-    }
-
     private fun containsClass(
         expression: JSExpression,
         targetClassName: String
-    ): Boolean = resolveArrayElements(expression).contains(targetClassName)
+    ): Boolean = expression.project.service<NestJSBeanService>()
+        .resolveArrayElements(expression)
+        .contains(targetClassName)
 }

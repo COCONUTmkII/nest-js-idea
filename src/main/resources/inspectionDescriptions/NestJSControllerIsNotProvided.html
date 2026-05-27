@@ -1,10 +1,51 @@
 <html>
 <body>
-<p>Detects NestJS controllers that are not provided in any module.</p>
 
-<p>This inspection helps identify controllers that are decorated with <code>@Controller</code> but are not listed in the <code>controllers</code> array of any NestJS module. Such controllers will not be instantiated by the framework and may cause runtime errors.</p>
+<p>
+  Detects NestJS controllers that are not registered in any NestJS module.
+</p>
 
-<p>Example:</p>
+<p>
+  This inspection identifies classes decorated with <code>@Controller</code>
+  that are not included in the <code>controllers</code> metadata
+  of any NestJS module.
+</p>
+
+<p>
+  The inspection supports both:
+</p>
+
+<ul>
+  <li>Static module metadata via <code>@Module({...})</code></li>
+  <li>Dynamic modules returning <code>DynamicModule</code></li>
+</ul>
+
+<p>
+  Dynamic module support includes patterns such as:
+</p>
+
+<pre><code>
+@Module({})
+export class SessionModule {
+
+  static forRoot(): DynamicModule {
+    return {
+      module: SessionModule,
+      controllers: [SessionController],
+    };
+  }
+}
+</code></pre>
+
+<p>
+  Controllers that are not registered in any module
+  will not be instantiated by NestJS and may lead to runtime errors.
+</p>
+
+<p>
+  Example:
+</p>
+
 <pre><code>
 import { Controller } from '@nestjs/common';
 
@@ -12,10 +53,18 @@ import { Controller } from '@nestjs/common';
 export class MyController {
   // ...
 }
-// If MyController is not added to any module's controllers array, it will be flagged by this inspection.
 </code></pre>
 
-<p>To fix this, ensure the controller is included in the <code>controllers</code> array of a module, e.g.:</p>
+<p>
+  If <code>MyController</code> is not added to any module's
+  <code>controllers</code> metadata,
+  it will be reported by this inspection.
+</p>
+
+<p>
+  To fix this, register the controller in a module:
+</p>
+
 <pre><code>
 import { Module } from '@nestjs/common';
 import { MyController } from './my.controller';
@@ -25,5 +74,23 @@ import { MyController } from './my.controller';
 })
 export class MyModule {}
 </code></pre>
+
+<p>
+  Or inside a dynamic module:
+</p>
+
+<pre><code>
+@Module({})
+export class MyModule {
+
+  static forRoot(): DynamicModule {
+    return {
+      module: MyModule,
+      controllers: [MyController],
+    };
+  }
+}
+</code></pre>
+
 </body>
 </html>

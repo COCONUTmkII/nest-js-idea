@@ -31,6 +31,11 @@
                          level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"
                          key="nestjs.inspection.controller.is.not.provided"
         />
+        <localInspection language="TypeScript"
+                         implementationClass="com.coconutmkii.nestjsidea.inspections.NestJSModuleIsNotUsedProvidedInspection"
+                         level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"
+                         key="nestjs.inspection.module.is.not.used"
+        />
     </extensions>
 
     <applicationListeners>
