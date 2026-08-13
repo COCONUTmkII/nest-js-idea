@@ -1,12 +1,6 @@
 package com.coconutmkii.nestjsidea.framework.file
 
 import com.coconutmkii.nestjsidea.NestJSBundle
-import com.coconutmkii.nestjsidea.NestJSIcons.controllerIcon
-import com.coconutmkii.nestjsidea.NestJSIcons.guardIcon
-import com.coconutmkii.nestjsidea.NestJSIcons.moduleIcon
-import com.coconutmkii.nestjsidea.NestJSIcons.pipeIcon
-import com.coconutmkii.nestjsidea.NestJSIcons.resolverIcon
-import com.coconutmkii.nestjsidea.NestJSIcons.serviceIcon
 import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
 import com.coconutmkii.nestjsidea.util.isNestProject
 import com.intellij.ide.actions.CreateFileFromTemplateAction
@@ -54,46 +48,27 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
         builder: CreateFileFromTemplateDialog.Builder
     ) {
         builder.setTitle(NestJSBundle.message("nestjs.dialog.title.new.nest.file"))
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.controller"), controllerIcon, CONTROLLER_TEMPLATE)
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.service"), serviceIcon, SERVICE_TEMPLATE)
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.module"), moduleIcon, MODULE_TEMPLATE)
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.pipe"), pipeIcon, PIPE_TEMPLATE)
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.resolver"), resolverIcon, RESOLVER_TEMPLATE)
-            .addKind(NestJSBundle.message("nestjs.dialog.title.new.nest.file.guard"), guardIcon, GUARD_TEMPLATE)
-            .setValidator(NoWhitespaceValidator())
+        NestJSFileTemplate.entries.forEach {
+            builder.addKind(NestJSBundle.message(it.titleKey), it.icon, it.templateName)
+        }
+        builder.setValidator(NoWhitespaceValidator())
     }
 
     override fun getActionName(
         directory: PsiDirectory?,
         newName: @NonNls String,
         templateName: @NonNls String?
-    ): @NlsContexts.Command String? {
+    ): @NlsContexts.Command String {
         return NestJSBundle.message("nestjs.dialog.title.new.nest.file", arrayOf(newName))
     }
 
-    override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile? {
-        val extension = ".ts"
-
-        val cleanName = name
-            .trim()
+    override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile {
+        val kind = NestJSFileTemplate.byTemplateName(template.name)
+        val cleanName = name.trim()
             .replace("\\s+".toRegex(), "")
-
-        val baseName = cleanName.removeSuffix("Controller")
-            .removeSuffix("Service")
-            .removeSuffix("Module")
-            .removeSuffix("Pipe")
-            .removeSuffix("Guard")
-            .removeSuffix("Resolver")
-
-        val fileName = when (template.name) {
-            CONTROLLER_TEMPLATE -> "${toKebabCase(baseName)}.controller$extension"
-            SERVICE_TEMPLATE -> "${toKebabCase(baseName)}.service$extension"
-            MODULE_TEMPLATE -> "${toKebabCase(baseName)}.module$extension"
-            PIPE_TEMPLATE -> "${toKebabCase(baseName)}.pipe$extension"
-            GUARD_TEMPLATE -> "${toKebabCase(baseName)}.guard$extension"
-            RESOLVER_TEMPLATE -> "${toKebabCase(baseName)}.resolver$extension"
-            else -> "$name$extension"
-        }
+            .replace(Regex("\\.ts$"), "")
+        val fileName = if (kind == null) "$cleanName.ts"
+        else "${toKebabCase(cleanName.removeSuffix(kind.fileSuffix))}.ts"
 
         val props = FileTemplateManager.getInstance(dir.project).defaultProperties
         props["NAME"] = name

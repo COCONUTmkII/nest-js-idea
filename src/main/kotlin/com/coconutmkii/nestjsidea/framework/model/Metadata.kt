@@ -1,7 +1,5 @@
 package com.coconutmkii.nestjsidea.framework.model
 
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
-
 data class NestJsModuleMetadata(
     val controllers: Set<String>,
     val providers: Set<String>,
@@ -30,10 +28,16 @@ data class NestJsModuleMetadata(
     }
 }
 
-data class NestJsModuleIndex(
-    val modules: List<TypeScriptClass>,
-    val moduleToImports: Map<TypeScriptClass, Set<String>>,
-    val moduleToControllers: Map<TypeScriptClass, Set<String>>,
-    val moduleToProviders: Map<TypeScriptClass, Set<String>>,
-    val moduleToExports: Map<TypeScriptClass, Set<String>>,
-)
+enum class NestJSModuleProperty(val providerKey: String) {
+    IMPORTS("imports"),
+    CONTROLLERS("controllers"),
+    EXPORTS("exports"),
+    PROVIDERS("providers"),
+    FORWARD_REF("forwardRef");
+}
+
+enum class NestJSProviderProperty(val key: String) {
+    PROVIDE("provide"),
+    USE_CLASS("useClass"),
+    USE_EXISTING("useExisting"),
+}

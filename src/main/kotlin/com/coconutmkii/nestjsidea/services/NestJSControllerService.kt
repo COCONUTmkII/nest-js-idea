@@ -1,19 +1,13 @@
 package com.coconutmkii.nestjsidea.services
 
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
-import com.coconutmkii.nestjsidea.util.CONTROLLERS_PROVIDER
-import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
+import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.intellij.lang.javascript.psi.JSExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
-import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.lang.javascript.psi.JSReturnStatement
-import com.intellij.lang.javascript.psi.JSSpreadExpression
-import com.intellij.lang.javascript.psi.JSVariable
-import com.intellij.lang.javascript.psi.StubSafe
 import com.intellij.lang.javascript.psi.ecma6.ES6Decorator
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
-import com.intellij.lang.javascript.psi.util.JSUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.psi.util.PsiTreeUtil
@@ -50,7 +44,7 @@ class NestJSControllerService {
                 ?: return false
 
         val controllersArray = initializer
-            .findProperty(CONTROLLERS_PROVIDER)
+            .findProperty(NestJSModuleProperty.CONTROLLERS.providerKey)
             ?.initializer
             ?: return false
 
@@ -88,7 +82,7 @@ class NestJSControllerService {
 
                 val controllersInitializer =
                     objectLiteral
-                        .findProperty(CONTROLLERS_PROVIDER)
+                        .findProperty(NestJSModuleProperty.CONTROLLERS.providerKey)
                         ?.initializer
                         ?: continue
 

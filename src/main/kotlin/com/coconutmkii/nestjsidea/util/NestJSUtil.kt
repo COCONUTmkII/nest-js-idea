@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NonNls
 
 const val NESTJS_CLI_PACKAGE = "@nestjs/cli"
 const val NESTJS_COMMON_PACKAGE = "@nestjs/common"
-const val CONTROLLERS_PROVIDER = "controllers"
 private val NESTJS_JSON_NAMES = listOf("nest-cli.json", ".nest-cli.json")
 private val NEST_JS_EXCLUDES = listOf("dist", "out", "tmp", "coverage", "build")
 

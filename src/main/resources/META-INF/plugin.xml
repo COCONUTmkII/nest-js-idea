@@ -26,6 +26,7 @@
         <internalFileTemplate name="NestJS Module"/>
         <internalFileTemplate name="NestJS Pipe"/>
         <internalFileTemplate name="NestJS Service"/>
+        <internalFileTemplate name="NestJS Resolver"/>
         <localInspection language="TypeScript"
                          implementationClass="com.coconutmkii.nestjsidea.inspections.NestJSControllerIsNotProvidedInspection"
                          level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"

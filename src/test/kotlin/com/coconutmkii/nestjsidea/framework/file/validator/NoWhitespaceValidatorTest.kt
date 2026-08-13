@@ -2,6 +2,7 @@ package com.coconutmkii.nestjsidea.framework.file.validator
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -37,9 +38,13 @@ class NoWhitespaceValidatorTest {
     }
 
     @Test
-    fun `errorText is not null`() {
-        val error = validator.getErrorText("Invalid Name")
-        assertNotNull(error)
-        assertTrue(error!!.isNotBlank())
+    fun `errorText is null for valid input`() {
+        assertNull(validator.getErrorText("MyClass"))
+    }
+
+    @Test
+    fun `errorText is present for invalid input`() {
+        assertNotNull(validator.getErrorText("My Class"))
+        assertNotNull(validator.getErrorText(""))
     }
 }

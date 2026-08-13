@@ -1,6 +1,7 @@
 package com.coconutmkii.nestjsidea.services
 
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
+import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.coconutmkii.nestjsidea.framework.model.NestJsModuleMetadata
 import com.intellij.lang.javascript.TypeScriptFileType
 import com.intellij.lang.javascript.psi.JSCallExpression
@@ -94,11 +95,7 @@ class NestJSModuleService {
     ): Boolean {
         val targetName = targetModule.name ?: return false
 
-        if (isRootModule(targetModule)) {
-            return true
-        }
-
-        return allModules.any { module ->
+        return isRootModule(targetModule) || allModules.any { module ->
 
             // don't self-check
             if (module == targetModule) {
@@ -144,18 +141,18 @@ class NestJSModuleService {
                     continue
                 }
 
-                controllers += resolve(obj, "controllers")
-                providers += resolve(obj, "providers")
-                imports += resolve(obj, "imports")
-                exports += resolve(obj, "exports")
+                controllers += resolve(obj, NestJSModuleProperty.CONTROLLERS.providerKey)
+                providers += resolve(obj, NestJSModuleProperty.PROVIDERS.providerKey)
+                imports += resolve(obj, NestJSModuleProperty.IMPORTS.providerKey)
+                exports += resolve(obj, NestJSModuleProperty.EXPORTS.providerKey)
             }
         }
 
         return NestJsModuleMetadata(
             controllers,
             providers,
-            imports,
-            exports
+            exports,
+            imports
         )
     }
 

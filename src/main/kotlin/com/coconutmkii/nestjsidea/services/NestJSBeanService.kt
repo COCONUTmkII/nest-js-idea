@@ -1,8 +1,13 @@
 package com.coconutmkii.nestjsidea.services
 
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
+import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
+import com.coconutmkii.nestjsidea.framework.model.NestJSProviderProperty
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
+import com.intellij.lang.javascript.psi.JSCallExpression
+import com.intellij.lang.javascript.psi.JSConditionalExpression
 import com.intellij.lang.javascript.psi.JSExpression
+import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.lang.javascript.psi.JSSpreadExpression
 import com.intellij.lang.javascript.psi.JSVariable
@@ -11,6 +16,8 @@ import com.intellij.lang.javascript.psi.util.JSUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 
 @Service(Service.Level.PROJECT)
 class NestJSBeanService {
@@ -49,46 +56,74 @@ class NestJSBeanService {
         }
     }
 
-    fun resolveArrayElements(
-        expression: JSExpression
+    fun resolveArrayElements(expression: JSExpression): Set<String> =
+        resolveArrayElements(expression, mutableSetOf(), mutableSetOf())
+
+    private fun resolveArrayElements(
+        expression: JSExpression,
+        visited: MutableSet<PsiElement>,
+        result: MutableSet<String>,
     ): Set<String> {
-        val result = mutableSetOf<String>()
+        if (!visited.add(expression)) return result
+
         when (val unwrapped = JSUtils.unparenthesize(expression)) {
-            is JSArrayLiteralExpression -> {
-                unwrapped.expressions.forEach { element ->
-                    when (element) {
-                        is JSReferenceExpression -> {
-                            // [A]
-                            element.referenceName?.let {
-                                result.add(it)
-                            }
+            is JSArrayLiteralExpression ->
+                unwrapped.expressions.forEach { collectElement(it, visited, result) }
 
-                            // [...BASE]
-                            val resolved = element.resolve()
-                            val variable = resolved as? JSVariable
-                            val initializer = variable?.initializer
+            is JSReferenceExpression ->
+                (unwrapped.resolve() as? JSVariable)?.initializer
+                    ?.let { resolveArrayElements(it, visited, result) }
 
-                            if (initializer != null) {
-                                result.addAll(resolveArrayElements(initializer))
-                            }
-                        }
-                        is JSSpreadExpression -> {
-                            val inner = element.expression ?: return@forEach
-                            result.addAll(resolveArrayElements(inner))
-                        }
-                    }
+            // [...(isProd ? [ProdModule] : [])]
+            is JSConditionalExpression -> {
+                unwrapped.thenBranch?.let { resolveArrayElements(it, visited, result) }
+                unwrapped.elseBranch?.let { resolveArrayElements(it, visited, result) }
+            }
+        }
+        return result
+    }
+
+    private fun collectElement(
+        element: JSExpression?,
+        visited: MutableSet<PsiElement>,
+        result: MutableSet<String>,
+    ) {
+        when (val e = JSUtils.unparenthesize(element ?: return)) {
+            is JSReferenceExpression -> {
+                e.referenceName?.let(result::add)
+                (e.resolve() as? JSVariable)?.initializer
+                    ?.let { resolveArrayElements(it, visited, result) }
+            }
+            is JSSpreadExpression ->
+                resolveArrayElements(e.expression ?: return, visited, result)
+            is JSCallExpression -> {
+                val method = e.methodExpression as? JSReferenceExpression
+                when {
+                    // [ConfigModule.forRoot()], [TypeOrmModule.forFeature([...])]
+                    method?.qualifier != null ->
+                        (method.qualifier as? JSReferenceExpression)?.referenceName?.let(result::add)
+
+                    // [forwardRef(() => UserModule)]
+                    method?.referenceName == NestJSModuleProperty.FORWARD_REF.providerKey ->
+                        e.arguments.firstOrNull()
+                            ?.let { PsiTreeUtil.findChildrenOfType(it, JSReferenceExpression::class.java) }
+                            ?.forEach { ref -> ref.referenceName?.let(result::add) }
                 }
             }
 
-            is JSReferenceExpression -> {
-                // controllers
-                val resolved = unwrapped.resolve()
-                val variable = resolved as? JSVariable ?: return emptySet()
-                val initializer = variable.initializer ?: return emptySet()
-                result.addAll(resolveArrayElements(initializer))
+            // [{ provide: TOKEN, useClass: MyService }]
+            is JSObjectLiteralExpression -> {
+                NestJSProviderProperty.entries.forEach { provider ->
+                    (e.findProperty(provider.key)?.initializer as? JSReferenceExpression)
+                        ?.referenceName?.let(result::add)
+                }
+            }
+
+            // [isProd ? ProdModule : DevModule]
+            is JSConditionalExpression -> {
+                collectElement(e.thenBranch, visited, result)
+                collectElement(e.elseBranch, visited, result)
             }
         }
-
-        return result
     }
 }
