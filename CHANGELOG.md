@@ -40,3 +40,8 @@
 ##[0.0.6] - 2026-05-20
 ### Added
 - Support for intellij platforms 2026.2
+
+##[0.0.7] - 2026-08-26
+### Added
+- Inspection for modules to check are they used or imported correctly
+- Controllers inspection now can check both dynamic and static modules

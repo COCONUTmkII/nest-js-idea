@@ -8,16 +8,15 @@ class NestJSModuleInspectionTest : NestJSInspectionsTestBase() {
         enable(arrayOf(NestJSModuleIsNotUsedProvidedInspection()))
     }
 
-    // Контрольный случай: обычная ссылка на модуль в imports.
-    fun testPlainImportIsNotReported() {
+    fun `test plain import is not reported`() {
         checkDirectory(
             "inspections/module/plainImport",
             "config.module.ts"
         )
     }
 
-    // Проверяемый случай: тот же модуль, но подключённый через forRoot().
-    fun testForRootImportIsNotReported() {
+    // The same module but with forRoot()
+    fun `test for root import is not reported`() {
         checkDirectory(
             "inspections/module/forRoot",
             "config.module.ts"

@@ -45,7 +45,7 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
         baseDir: VirtualFile,
         settings: Settings,
     ): Array<String> {
-        val selectedManager = settings?.getUserData(packageManagerSetupKey) ?: PackageManager.NPM
+        val selectedManager = settings.getUserData(packageManagerSetupKey) ?: PackageManager.NPM
         val projectName = project.name
         return arrayOf("new", "--directory", ".", "--package-manager", selectedManager.label, projectName)
     }
@@ -54,11 +54,11 @@ class NestJSProjectGenerator : NpmPackageProjectGenerator() {
 
     override fun presentablePackageName(): String = NestJSBundle.message("nestjs.presentable.package.name")
 
-    override fun getDescription(): @NlsContexts.DetailedDescription String? = NestJSBundle.message("nestjs.cli.description")
+    override fun getDescription(): @NlsContexts.DetailedDescription String = NestJSBundle.message("nestjs.cli.description")
 
     override fun getName(): @NlsContexts.Label String = NestJSBundle.message("nestjs.cli")
 
-    override fun getId(): String? = NestJSBundle.message("nestjs.cli")
+    override fun getId(): String = NestJSBundle.message("nestjs.cli")
 
     private fun ContentEntry.addDefaultNestJSExcludes(baseDir: VirtualFile) {
         addExcludeFolder("${baseDir.url}/dist")
