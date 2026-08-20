@@ -3,7 +3,6 @@ package com.coconutmkii.nestjsidea.services
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
 import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.coconutmkii.nestjsidea.framework.model.NestJsModuleMetadata
-import com.intellij.lang.javascript.TypeScriptFileType
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
@@ -13,6 +12,7 @@ import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
 import com.intellij.lang.javascript.psi.stubs.JSClassIndex
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiManager
@@ -233,7 +233,7 @@ class NestJSModuleService {
             PsiManager.getInstance(project)
 
         FileTypeIndex.processFiles(
-            TypeScriptFileType.INSTANCE,
+            FileTypeManager.getInstance().getFileTypeByExtension("ts"),
             { virtualFile ->
 
                 val file =
