@@ -24,7 +24,7 @@ class NestJSSchematicOptionsDialog(
         init()
     }
 
-    override fun createCenterPanel(): JComponent? {
+    override fun createCenterPanel(): JComponent {
         val panel = JPanel(BorderLayout(0, 4)).apply {
             add(JLabel(schematic.description), BorderLayout.NORTH)
         }

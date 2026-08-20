@@ -50,7 +50,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import javax.swing.JList
 
-class NestJSSchematicCLIAction() : DumbAwareAction(nestIcon) {
+class NestJSSchematicCLIAction : DumbAwareAction(nestIcon) {
     override fun update(e: AnActionEvent) {
         val project = e.project ?: return
         val file = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return

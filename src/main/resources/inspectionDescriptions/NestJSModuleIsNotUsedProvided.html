@@ -1,0 +1,82 @@
+<html>
+<body>
+
+<p>
+    Detects NestJS modules that are not used anywhere in the application.
+</p>
+
+<p>
+    This inspection identifies classes decorated with <code>@Module</code>
+    that are not referenced in any other module's <code>imports</code> array
+    and are not used as application root modules via <code>NestFactory.create()</code>.
+</p>
+
+<p>
+    A module is considered <b>used</b> if:
+</p>
+
+<ul>
+    <li>It is imported by another module (<code>imports: [...]</code>)</li>
+    <li>It is used as a root module in application bootstrap (<code>NestFactory.create(AppModule)</code>)</li>
+</ul>
+
+<p>
+    Both static and dynamic NestJS modules are supported:
+</p>
+
+<pre><code>
+@Module({
+  imports: [UserModule],
+})
+export class AppModule {}
+</code></pre>
+
+<pre><code>
+@Module({})
+export class SessionModule {
+
+  static forRoot(): DynamicModule {
+    return {
+      module: SessionModule,
+      imports: [DatabaseModule],
+    };
+  }
+}
+</code></pre>
+
+<p>
+    The inspection also supports dynamic bootstrap detection:
+</p>
+
+<pre><code>
+await NestFactory.create(AppModule);
+</code></pre>
+
+<p>
+    Modules that are not referenced anywhere in the module graph
+    and are not used as application entry points
+    are considered unused and will be reported.
+</p>
+
+<p>
+    Example of an unused module:
+</p>
+
+<pre><code>
+import { Module } from '@nestjs/common';
+
+@Module({})
+export class UnusedModule {}
+</code></pre>
+
+<p>
+    To fix this, ensure the module is either:
+</p>
+
+<ul>
+    <li>Imported in another module's <code>imports</code> array</li>
+    <li>Used as a root module in <code>NestFactory.create()</code></li>
+</ul>
+
+</body>
+</html>
