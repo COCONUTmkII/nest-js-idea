@@ -45,3 +45,8 @@
 ### Added
 - Inspection for modules to check are they used or imported correctly
 - Controllers inspection now can check both dynamic and static modules
+
+##[0.0.8] - 2026-09-01
+### Fixed
+- Fixed issue with the file creation
+

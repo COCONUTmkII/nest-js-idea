@@ -11,15 +11,16 @@ import javax.swing.Icon
 enum class NestJSFileTemplate(
     val templateName: String,
     val fileSuffix: String,
+    val classSuffix: String,
     val icon: Icon,
     val titleKey: String,
 ) {
-    CONTROLLER("NestJS Controller", "controller", controllerIcon, "nestjs.dialog.title.new.nest.file.controller"),
-    SERVICE("NestJS Service", "service", serviceIcon, "nestjs.dialog.title.new.nest.file.service"),
-    MODULE("NestJS Module", "module", moduleIcon, "nestjs.dialog.title.new.nest.file.module"),
-    PIPE("NestJS Pipe", "pipe", pipeIcon, "nestjs.dialog.title.new.nest.file.pipe"),
-    GUARD("NestJS Guard", "guard", guardIcon, "nestjs.dialog.title.new.nest.file.guard"),
-    RESOLVER("NestJS Resolver", "resolver", resolverIcon, "nestjs.dialog.title.new.nest.file.resolver"),
+    CONTROLLER("NestJS Controller", "controller", "Controller", controllerIcon, "nestjs.dialog.title.new.nest.file.controller"),
+    SERVICE("NestJS Service", "service", "Service", serviceIcon, "nestjs.dialog.title.new.nest.file.service"),
+    MODULE("NestJS Module", "module", "Module", moduleIcon, "nestjs.dialog.title.new.nest.file.module"),
+    PIPE("NestJS Pipe", "pipe", "Pipe",  pipeIcon, "nestjs.dialog.title.new.nest.file.pipe"),
+    GUARD("NestJS Guard", "guard", "Guard", guardIcon, "nestjs.dialog.title.new.nest.file.guard"),
+    RESOLVER("NestJS Resolver", "resolver", "Resolver", resolverIcon, "nestjs.dialog.title.new.nest.file.resolver"),
     ;
 
     companion object {

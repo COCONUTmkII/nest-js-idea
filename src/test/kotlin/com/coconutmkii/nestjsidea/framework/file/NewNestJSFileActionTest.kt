@@ -6,68 +6,20 @@ import org.junit.Test
 class NewNestJSFileActionTest {
 
     @Test
-    fun `toKebabCase should convert camelCase to kebab-case`() {
-        NewNestJsFileAction()
-        
-        fun toKebabCase(input: String): String = input
-            .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-            .lowercase()
-
-        assertEquals("my-controller", toKebabCase("MyController"))
-        assertEquals("user-service", toKebabCase("UserService"))
-        assertEquals("app-module", toKebabCase("AppModule"))
-        assertEquals("auth-guard", toKebabCase("AuthGuard"))
-        assertEquals("validation-pipe", toKebabCase("ValidationPipe"))
-        assertEquals("user-resolver", toKebabCase("UserResolver"))
-    }
-
-    @Test
-    fun `toKebabCase should handle already kebab-case`() {
-        fun toKebabCase(input: String): String = input
-            .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-            .lowercase()
-
-        assertEquals("my-controller", toKebabCase("my-controller"))
-        assertEquals("user-service", toKebabCase("user-service"))
-    }
-
-    @Test
-    fun `toKebabCase should handle all lowercase`() {
-        fun toKebabCase(input: String): String = input
-            .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-            .lowercase()
-
-        assertEquals("controller", toKebabCase("controller"))
-        assertEquals("service", toKebabCase("service"))
-    }
-
-    @Test
-    fun `toKebabCase should handle all uppercase`() {
-        fun toKebabCase(input: String): String = input
-            .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-            .lowercase()
-
-        assertEquals("controller", toKebabCase("CONTROLLER"))
-        assertEquals("user-service", toKebabCase("USER-SERVICE"))
-    }
-
-    @Test
-    fun `toKebabCase should handle consecutive uppercase letters`() {
-        fun toKebabCase(input: String): String = input
-            .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-            .lowercase()
-
-        assertEquals("http-client", toKebabCase("HTTP-Client"))
-        assertEquals("api-service", toKebabCase("API-Service"))
-    }
-
-    @Test
     fun `template constants should be defined correctly`() {
-        assertEquals("NestJS Controller", CONTROLLER_TEMPLATE)
-        assertEquals("NestJS Service", SERVICE_TEMPLATE)
-        assertEquals("NestJS Module", MODULE_TEMPLATE)
-        assertEquals("NestJS Pipe", PIPE_TEMPLATE)
-        assertEquals("NestJS Guard", GUARD_TEMPLATE)
-        assertEquals("NestJS Resolver", RESOLVER_TEMPLATE)
+        assertEquals("NestJS Controller", NestJSFileTemplate.CONTROLLER.templateName)
+        assertEquals("NestJS Service", NestJSFileTemplate.SERVICE.templateName)
+        assertEquals("NestJS Module", NestJSFileTemplate.MODULE.templateName)
+        assertEquals("NestJS Pipe", NestJSFileTemplate.PIPE.templateName)
+        assertEquals("NestJS Guard", NestJSFileTemplate.GUARD.templateName)
+        assertEquals("NestJS Resolver", NestJSFileTemplate.RESOLVER.templateName)
+    }
+
+    @Test
+    fun `every template is resolvable by its name`() {
+        NestJSFileTemplate.entries.forEach {
+            assertEquals(it, NestJSFileTemplate.byTemplateName(it.templateName))
+        }
+        assertNull(NestJSFileTemplate.byTemplateName("Unknown"))
     }
 }

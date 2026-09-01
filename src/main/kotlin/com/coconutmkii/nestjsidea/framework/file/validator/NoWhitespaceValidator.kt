@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.InputValidatorEx
 import com.intellij.openapi.util.NlsContexts
 
 class NoWhitespaceValidator : InputValidatorEx {
-    val whitespace = "\\s".toRegex()
+    private val whitespace = "\\s".toRegex()
     override fun checkInput(inputString: String?): Boolean {
         return !inputString.isNullOrBlank() && !inputString.contains(whitespace)
     }
