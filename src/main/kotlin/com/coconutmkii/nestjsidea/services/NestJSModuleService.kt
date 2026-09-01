@@ -149,10 +149,10 @@ class NestJSModuleService {
         }
 
         return NestJsModuleMetadata(
-            controllers,
-            providers,
-            exports,
-            imports
+            controllers = controllers,
+            providers = providers,
+            exports = exports,
+            imports = imports
         )
     }
 
@@ -165,10 +165,10 @@ class NestJSModuleService {
             ?: return NestJsModuleMetadata.EMPTY
 
         return NestJsModuleMetadata(
-            controllers = resolve(obj, "controllers"),
-            providers = resolve(obj, "providers"),
-            imports = resolve(obj, "imports"),
-            exports = resolve(obj, "exports")
+            controllers = resolve(obj, NestJSModuleProperty.CONTROLLERS.providerKey),
+            providers = resolve(obj, NestJSModuleProperty.PROVIDERS.providerKey),
+            imports = resolve(obj, NestJSModuleProperty.IMPORTS.providerKey),
+            exports = resolve(obj, NestJSModuleProperty.EXPORTS.providerKey)
         )
     }
 

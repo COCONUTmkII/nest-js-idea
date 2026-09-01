@@ -3,6 +3,7 @@ package com.coconutmkii.nestjsidea.framework.file
 import com.coconutmkii.nestjsidea.NestJSBundle
 import com.coconutmkii.nestjsidea.framework.file.validator.NoWhitespaceValidator
 import com.coconutmkii.nestjsidea.util.isNestProject
+import com.coconutmkii.nestjsidea.util.nestFileName
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.fileTemplates.FileTemplate
@@ -16,13 +17,6 @@ import com.intellij.openapi.util.NlsContexts
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import org.jetbrains.annotations.NonNls
-
-const val CONTROLLER_TEMPLATE = "NestJS Controller"
-const val SERVICE_TEMPLATE = "NestJS Service"
-const val MODULE_TEMPLATE = "NestJS Module"
-const val PIPE_TEMPLATE = "NestJS Pipe"
-const val GUARD_TEMPLATE = "NestJS Guard"
-const val RESOLVER_TEMPLATE = "NestJS Resolver"
 
 class NewNestJsFileAction : CreateFileFromTemplateAction(
     "NestJS File",
@@ -63,21 +57,12 @@ class NewNestJsFileAction : CreateFileFromTemplateAction(
     }
 
     override fun createFileFromTemplate(name: String, template: FileTemplate, dir: PsiDirectory): PsiFile {
-        val kind = NestJSFileTemplate.byTemplateName(template.name)
-        val cleanName = name.trim()
-            .replace("\\s+".toRegex(), "")
-            .replace(Regex("\\.ts$"), "")
-        val fileName = if (kind == null) "$cleanName.ts"
-        else "${toKebabCase(cleanName.removeSuffix(kind.fileSuffix))}.ts"
+        val fileName = nestFileName(name, NestJSFileTemplate.byTemplateName(template.name))
 
         val props = FileTemplateManager.getInstance(dir.project).defaultProperties
         props["NAME"] = name
 
         return FileTemplateUtil.createFromTemplate(template, fileName, props, dir) as PsiFile
     }
-
-    private fun toKebabCase(input: String): String = input
-        .replace(Regex("([a-z])([A-Z])"), "$1-$2")
-        .lowercase()
 
 }

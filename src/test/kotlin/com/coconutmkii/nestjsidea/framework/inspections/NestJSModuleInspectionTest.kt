@@ -22,4 +22,12 @@ class NestJSModuleInspectionTest : NestJSInspectionsTestBase() {
             "config.module.ts"
         )
     }
+
+    // Module imported inside static forRoot(): DynamicModule
+    fun `test dynamic module import is not reported`() {
+        checkDirectory(
+            "inspections/module/dynamicImport",
+            "database.module.ts"
+        )
+    }
 }

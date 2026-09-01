@@ -1,5 +1,6 @@
 package com.coconutmkii.nestjsidea.util
 
+import com.coconutmkii.nestjsidea.framework.file.NestJSFileTemplate
 import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.javascript.JSRunConfigurationBuilder
@@ -25,6 +26,12 @@ private val NESTJS_JSON_NAMES = listOf("nest-cli.json", ".nest-cli.json")
 private val NEST_JS_EXCLUDES = listOf("dist", "out", "tmp", "coverage", "build")
 
 fun isNestJsonFile(fileName: String): Boolean = NESTJS_JSON_NAMES.contains(fileName)
+
+internal fun nestFileName(typedName: String, kind: NestJSFileTemplate?): String {
+    val cleanName = typedName.trim().replace("\\s+".toRegex(), "").removeSuffix(".ts")
+    return if (kind == null) "$cleanName.ts"
+    else "${toKebabCase(cleanName.removeSuffix(kind.classSuffix))}.${kind.fileSuffix}.ts"
+}
 
 fun ContentEntry.addDefaultNestExcludes(rootDir: VirtualFile) {
     for (name in NEST_JS_EXCLUDES) {
@@ -91,16 +98,18 @@ fun getNestCliPackageVersion(cli: VirtualFile): SemVer? {
     return NodePackage(moduleInfo.virtualFile!!.path).version
 }
 
-private fun findNestCliModuleInfo(cli: VirtualFile?): CompletionModuleInfo? {
-    val modules = ArrayList<CompletionModuleInfo>()
-    NodeModuleSearchUtil.findModulesWithName(modules, NESTJS_CLI_PACKAGE, cli, null)
-    val moduleInfo = modules.firstOrNull()
-    return if (moduleInfo != null && moduleInfo.virtualFile != null) moduleInfo else null
+fun isNestProject(directory: PsiDirectory): Boolean {
+    val basePath = directory.project.basePath ?: return false
+    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
+    val text = String(packageJson.contentsToByteArray())
+    return text.contains("@nestjs/core")
 }
 
-private fun getPackageJson(baseDir: VirtualFile): String? {
-    val pkg = PackageJsonUtil.findChildPackageJsonFile(baseDir)
-    return pkg?.path
+fun isNestProject(project: Project): Boolean {
+    val basePath = project.basePath ?: return false
+    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
+    val text = String(packageJson.contentsToByteArray())
+    return text.contains("@nestjs/core")
 }
 
 fun getCliParamText(name: String, cliVersion: SemVer): String {
@@ -110,6 +119,18 @@ fun getCliParamText(name: String, cliVersion: SemVer): String {
     else
         name
     return "$paramText"
+}
+
+private fun findNestCliModuleInfo(cli: VirtualFile?): CompletionModuleInfo? {
+    val modules = ArrayList<CompletionModuleInfo>()
+    NodeModuleSearchUtil.findModulesWithName(modules, NESTJS_CLI_PACKAGE, cli, null)
+    val moduleInfo = modules.firstOrNull()
+    return if (moduleInfo?.virtualFile != null) moduleInfo else null
+}
+
+private fun getPackageJson(baseDir: VirtualFile): String? {
+    val pkg = PackageJsonUtil.findChildPackageJsonFile(baseDir)
+    return pkg?.path
 }
 
 private fun createNpmConfiguration(
@@ -136,16 +157,7 @@ private fun createIfNoSimilar(
     }
 }
 
-fun isNestProject(directory: PsiDirectory): Boolean {
-    val basePath = directory.project.basePath ?: return false
-    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
-    val text = String(packageJson.contentsToByteArray())
-    return text.contains("@nestjs/core")
-}
-
-fun isNestProject(project: Project): Boolean {
-    val basePath = project.basePath ?: return false
-    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
-    val text = String(packageJson.contentsToByteArray())
-    return text.contains("@nestjs/core")
-}
+// Mirrors normalizeToKebabOrSnakeCase from @nestjs/schematics so generated names match `nest generate`.
+private fun toKebabCase(input: String): String = input
+    .replace(Regex("([a-z\\d])([A-Z])"), "$1-$2")
+    .lowercase()
