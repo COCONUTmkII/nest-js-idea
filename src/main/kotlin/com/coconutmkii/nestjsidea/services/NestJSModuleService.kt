@@ -3,13 +3,13 @@ package com.coconutmkii.nestjsidea.services
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
 import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.coconutmkii.nestjsidea.framework.model.NestJsModuleMetadata
+import com.coconutmkii.nestjsidea.index.NestJSDecoratorIndex
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.lang.javascript.psi.JSReturnStatement
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
-import com.intellij.lang.javascript.psi.stubs.JSClassIndex
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.FileTypeManager
@@ -18,12 +18,12 @@ import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.indexing.FileBasedIndex
 
 @Service(Service.Level.PROJECT)
 class NestJSModuleService {
@@ -188,36 +188,16 @@ class NestJSModuleService {
     ): List<TypeScriptClass> {
         val scope = GlobalSearchScope.projectScope(project)
         val decoratorService = project.service<NestJSDecoratorService>()
+        val psiManager = PsiManager.getInstance(project)
 
-        val keys = mutableListOf<String>()
+        val files = FileBasedIndex.getInstance()
+            .getContainingFiles(NestJSDecoratorIndex.KEY, NestJSBeanType.MODULE.normilizedName, scope)
 
-        StubIndex.getInstance().processAllKeys(
-            JSClassIndex.KEY,
-            project
-        ) { key ->
-            keys += key
-            true
+        return files.flatMap { vf ->
+            val psiFile = psiManager.findFile(vf) ?: return@flatMap emptyList()
+            PsiTreeUtil.findChildrenOfType(psiFile, TypeScriptClass::class.java)
+                .filter { decoratorService.findNestDecorator(it, NestJSBeanType.MODULE.normilizedName) != null }
         }
-
-        val result = mutableListOf<TypeScriptClass>()
-
-        for (key in keys) {
-            val elements = JSClassIndex.getElements(
-                key,
-                project,
-                scope
-            )
-
-            for (element in elements) {
-                val clazz = element as? TypeScriptClass
-                    ?: continue
-
-                if (decoratorService.findNestDecorator(clazz, NestJSBeanType.MODULE.normilizedName) != null) {
-                    result += clazz
-                }
-            }
-        }
-        return result
     }
 
     private fun findRootModulesInternal(

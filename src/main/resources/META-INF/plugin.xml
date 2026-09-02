@@ -37,6 +37,7 @@
                          level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"
                          key="nestjs.inspection.module.is.not.used"
         />
+        <fileBasedIndex implementation="com.coconutmkii.nestjsidea.index.NestJSDecoratorIndex"/>
     </extensions>
 
     <applicationListeners>
