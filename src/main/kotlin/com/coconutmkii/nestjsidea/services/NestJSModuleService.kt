@@ -1,22 +1,20 @@
 package com.coconutmkii.nestjsidea.services
 
+import com.coconutmkii.nestjsidea.framework.model.DYNAMIC_MODULE_DISCRIMINATOR
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
 import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.coconutmkii.nestjsidea.framework.model.NestJsModuleMetadata
 import com.coconutmkii.nestjsidea.index.NestJSDecoratorIndex
-import com.intellij.lang.javascript.psi.JSCallExpression
+import com.coconutmkii.nestjsidea.index.NestJSRootModuleIndex
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
-import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.lang.javascript.psi.JSReturnStatement
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiManager
-import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
@@ -33,34 +31,19 @@ class NestJSModuleService {
             "nestjs.modules.cache"
         )
 
-    private val rootModulesCacheKey =
-        Key.create<CachedValue<Set<String>>>(
-            "nestjs.root.modules.cache"
-        )
-
     fun isRootModule(
         module: TypeScriptClass
     ): Boolean {
         val name = module.name ?: return false
-        return findRootModules(module.project)
-            .contains(name)
-    }
 
-    fun findRootModules(
-        project: Project
-    ): Set<String> = CachedValuesManager
-        .getManager(project)
-        .getCachedValue(
-            project,
-            rootModulesCacheKey,
-            {
-                CachedValueProvider.Result.create(
-                    findRootModulesInternal(project),
-                    PsiModificationTracker.MODIFICATION_COUNT
-                )
-            },
-            false
-        )
+        return FileBasedIndex.getInstance()
+            .getContainingFiles(
+                NestJSRootModuleIndex.KEY,
+                name,
+                GlobalSearchScope.projectScope(module.project)
+            )
+            .isNotEmpty()
+    }
 
     fun findAllNestModules(
         project: Project
@@ -83,11 +66,13 @@ class NestJSModuleService {
         targetModuleName: String
     ): Boolean = buildModuleMetadata(module).imports.contains(targetModuleName)
 
-    fun buildModuleMetadata(module: TypeScriptClass): NestJsModuleMetadata {
-        val staticMetadata = extractModuleMetadata(module)
-        val dynamicMetadata = extractDynamicModuleMetadata(module)
-        return staticMetadata.merge(dynamicMetadata)
-    }
+    fun buildModuleMetadata(module: TypeScriptClass): NestJsModuleMetadata =
+        CachedValuesManager.getCachedValue(module) {
+            CachedValueProvider.Result.create(
+                extractModuleMetadata(module).merge(extractDynamicModuleMetadata(module)),
+                module.containingFile
+            )
+        }
 
     fun isModuleUsedAnywhere(
         targetModule: TypeScriptClass,
@@ -137,14 +122,14 @@ class NestJSModuleService {
                         ?: continue
 
                 // DynamicModule objects always contain "module"
-                if (obj.findProperty("module") == null) {
+                if (obj.findProperty(DYNAMIC_MODULE_DISCRIMINATOR) == null) {
                     continue
                 }
 
-                controllers += resolve(obj, NestJSModuleProperty.CONTROLLERS.providerKey)
-                providers += resolve(obj, NestJSModuleProperty.PROVIDERS.providerKey)
-                imports += resolve(obj, NestJSModuleProperty.IMPORTS.providerKey)
-                exports += resolve(obj, NestJSModuleProperty.EXPORTS.providerKey)
+                controllers += resolve(obj, NestJSModuleProperty.CONTROLLERS.key)
+                providers += resolve(obj, NestJSModuleProperty.PROVIDERS.key)
+                imports += resolve(obj, NestJSModuleProperty.IMPORTS.key)
+                exports += resolve(obj, NestJSModuleProperty.EXPORTS.key)
             }
         }
 
@@ -158,31 +143,20 @@ class NestJSModuleService {
 
     fun extractModuleMetadata(module: TypeScriptClass): NestJsModuleMetadata {
         val decoratorService = module.project.service<NestJSDecoratorService>()
-        val decorator = decoratorService.findNestDecorator(module, NestJSBeanType.MODULE.normilizedName)
+        val decorator = decoratorService.findNestDecorator(module, NestJSBeanType.MODULE.normalizedName)
             ?: return NestJsModuleMetadata.EMPTY
 
         val obj = decoratorService.getObjectLiteralInitializer(decorator)
             ?: return NestJsModuleMetadata.EMPTY
 
         return NestJsModuleMetadata(
-            controllers = resolve(obj, NestJSModuleProperty.CONTROLLERS.providerKey),
-            providers = resolve(obj, NestJSModuleProperty.PROVIDERS.providerKey),
-            imports = resolve(obj, NestJSModuleProperty.IMPORTS.providerKey),
-            exports = resolve(obj, NestJSModuleProperty.EXPORTS.providerKey)
+            controllers = resolve(obj, NestJSModuleProperty.CONTROLLERS.key),
+            providers = resolve(obj, NestJSModuleProperty.PROVIDERS.key),
+            imports = resolve(obj, NestJSModuleProperty.IMPORTS.key),
+            exports = resolve(obj, NestJSModuleProperty.EXPORTS.key)
         )
     }
 
-    /**
-    * IMPORTANT:
-    * We must NOT call JSClassIndex.getElements()
-    * inside processAllKeys().
-    *
-    * Otherwise, IntelliJ throws:
-    *
-    * IllegalStateException:
-    * Nesting processElements call under other
-    * stub index operation can lead to a deadlock.
-    */
     private fun findAllNestModulesInternal(
         project: Project
     ): List<TypeScriptClass> {
@@ -191,69 +165,13 @@ class NestJSModuleService {
         val psiManager = PsiManager.getInstance(project)
 
         val files = FileBasedIndex.getInstance()
-            .getContainingFiles(NestJSDecoratorIndex.KEY, NestJSBeanType.MODULE.normilizedName, scope)
+            .getContainingFiles(NestJSDecoratorIndex.KEY, NestJSBeanType.MODULE.normalizedName, scope)
 
         return files.flatMap { vf ->
             val psiFile = psiManager.findFile(vf) ?: return@flatMap emptyList()
             PsiTreeUtil.findChildrenOfType(psiFile, TypeScriptClass::class.java)
-                .filter { decoratorService.findNestDecorator(it, NestJSBeanType.MODULE.normilizedName) != null }
+                .filter { decoratorService.findNestDecorator(it, NestJSBeanType.MODULE.normalizedName) != null }
         }
-    }
-
-    private fun findRootModulesInternal(
-        project: Project
-    ): Set<String> {
-
-        val result = mutableSetOf<String>()
-
-        val scope =
-            GlobalSearchScope.projectScope(project)
-
-        val psiManager =
-            PsiManager.getInstance(project)
-
-        FileTypeIndex.processFiles(
-            FileTypeManager.getInstance().getFileTypeByExtension("ts"),
-            { virtualFile ->
-
-                val file =
-                    psiManager.findFile(virtualFile)
-                        ?: return@processFiles true
-
-                val calls =
-                    PsiTreeUtil.findChildrenOfType(
-                        file,
-                        JSCallExpression::class.java
-                    )
-
-                for (call in calls) {
-                    val method = call.methodExpression as? JSReferenceExpression
-                        ?: continue
-
-                    if (method.referenceName != "create") {
-                        continue
-                    }
-
-                    val qualifier = method.qualifier
-                        ?.text
-                        ?: continue
-
-                    if (qualifier != "NestFactory") {
-                        continue
-                    }
-
-                    val firstArg = call.arguments.firstOrNull() as? JSReferenceExpression
-                        ?: continue
-
-                    firstArg.referenceName?.let {
-                        result.add(it)
-                    }
-                }
-                true
-            },
-            scope
-        )
-        return result
     }
 
     private fun resolve(

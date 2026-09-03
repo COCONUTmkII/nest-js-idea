@@ -38,11 +38,9 @@
                          key="nestjs.inspection.module.is.not.used"
         />
         <fileBasedIndex implementation="com.coconutmkii.nestjsidea.index.NestJSDecoratorIndex"/>
+        <fileBasedIndex implementation="com.coconutmkii.nestjsidea.index.NestJSRootModuleIndex"/>
     </extensions>
 
-    <applicationListeners>
-
-    </applicationListeners>
     <actions>
         <action id="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction"
                 class="com.coconutmkii.nestjsidea.framework.file.NewNestJsFileAction" text="New Nest File">
