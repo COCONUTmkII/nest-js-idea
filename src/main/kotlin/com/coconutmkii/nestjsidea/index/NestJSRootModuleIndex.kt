@@ -23,12 +23,12 @@ class NestJSRootModuleIndex : ScalarIndexExtension<String>() {
     override fun dependsOnFileContent(): Boolean = true
 
     override fun getIndexer(): DataIndexer<String, Void, FileContent> = DataIndexer { content ->
-        if (!content.contentAsText.contains("NestFactory")) return@DataIndexer emptyMap()
+        if (!content.contentAsText.contains(NEST_FACTORY)) return@DataIndexer emptyMap()
 
         val result = mutableMapOf<String, Void?>()
         PsiTreeUtil.findChildrenOfType(content.psiFile, JSCallExpression::class.java).forEach { call ->
             val method = call.methodExpression as? JSReferenceExpression ?: return@forEach
-            if (method.referenceName != "create" || method.qualifier?.text != "NestFactory") return@forEach
+            if (method.referenceName !in FACTORY_METHODS || method.qualifier?.text != NEST_FACTORY) return@forEach
             (call.arguments.firstOrNull() as? JSReferenceExpression)?.referenceName?.let { result[it] = null }
         }
         result
@@ -39,6 +39,8 @@ class NestJSRootModuleIndex : ScalarIndexExtension<String>() {
     override fun getVersion(): Int = 1
 
     companion object {
+        private const val NEST_FACTORY = "NestFactory"
+        private val FACTORY_METHODS = setOf("create", "createMicroservice", "createApplicationContext")
         val KEY: ID<String, Void> = ID.create("nestjs.root.module.index")
     }
 }

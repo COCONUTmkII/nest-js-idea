@@ -1,6 +1,7 @@
 package com.coconutmkii.nestjsidea.services
 
 import com.coconutmkii.nestjsidea.util.NESTJS_COMMON_PACKAGE
+import com.coconutmkii.nestjsidea.util.isNestProject
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.JSCallExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
@@ -40,6 +41,7 @@ class NestJSDecoratorService {
         decorator: ES6Decorator,
         name: String
     ): Boolean {
+        if (!isNestProject(decorator.project)) return false
 
         val decoratorName =
             decorator.decoratorName

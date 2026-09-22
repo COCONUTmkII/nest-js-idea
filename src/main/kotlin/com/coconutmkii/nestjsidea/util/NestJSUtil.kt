@@ -6,6 +6,8 @@ import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.javascript.JSRunConfigurationBuilder
 import com.intellij.javascript.nodejs.CompletionModuleInfo
 import com.intellij.javascript.nodejs.NodeModuleSearchUtil
+import com.intellij.javascript.nodejs.PackageJsonData
+import com.intellij.javascript.nodejs.packageJson.PackageJsonFileManager
 import com.intellij.javascript.nodejs.util.NodePackage
 import com.intellij.lang.javascript.JSStringUtil
 import com.intellij.lang.javascript.buildTools.npm.PackageJsonUtil
@@ -14,16 +16,22 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.text.SemVer
 import org.jetbrains.annotations.NonNls
 
 const val NESTJS_CLI_PACKAGE = "@nestjs/cli"
 const val NESTJS_COMMON_PACKAGE = "@nestjs/common"
+const val NESTJS_CORE_PACKAGE = "@nestjs/core"
 private val NESTJS_JSON_NAMES = listOf("nest-cli.json", ".nest-cli.json")
 private val NEST_JS_EXCLUDES = listOf("dist", "out", "tmp", "coverage", "build")
+private val nestProjectCacheKey = Key.create<CachedValue<Boolean>>("nestjs.is.nest.project")
 
 fun isNestJsonFile(fileName: String): Boolean = NESTJS_JSON_NAMES.contains(fileName)
 
@@ -98,19 +106,33 @@ fun getNestCliPackageVersion(cli: VirtualFile): SemVer? {
     return NodePackage(moduleInfo.virtualFile!!.path).version
 }
 
-fun isNestProject(directory: PsiDirectory): Boolean {
-    val basePath = directory.project.basePath ?: return false
-    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
-    val text = String(packageJson.contentsToByteArray())
-    return text.contains("@nestjs/core")
-}
+fun isNestProject(directory: PsiDirectory): Boolean = isNestProject(directory.project)
 
-fun isNestProject(project: Project): Boolean {
-    val basePath = project.basePath ?: return false
-    val packageJson = LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("package.json") ?: return false
-    val text = String(packageJson.contentsToByteArray())
-    return text.contains("@nestjs/core")
-}
+/**
+ * Called from [com.coconutmkii.nestjsidea.framework.file.NestJSFileIconProvider] for every file painted in the
+ * project tree, so the answer is cached until any package.json in the project is added, removed or edited.
+ */
+fun isNestProject(project: Project): Boolean = CachedValuesManager.getManager(project).getCachedValue(
+    project,
+    nestProjectCacheKey,
+    {
+        val packageJsonManager = PackageJsonFileManager.getInstance(project)
+        val packageJsonFiles = packageJsonManager.validPackageJsonFiles.ifEmpty { rootPackageJson(project) }
+
+        CachedValueProvider.Result.create(
+            packageJsonFiles.any { PackageJsonData.getOrCreate(it).isDependencyOfAnyType(NESTJS_CORE_PACKAGE) },
+            packageJsonManager.modificationTracker
+        )
+    },
+    false
+)
+
+// PackageJsonFileManager fills its file set from VFS events, which may not have arrived yet right after project open.
+private fun rootPackageJson(project: Project): Set<VirtualFile> = project.basePath
+    ?.let { LocalFileSystem.getInstance().findFileByPath(it) }
+    ?.let { PackageJsonUtil.findChildPackageJsonFile(it) }
+    ?.let { setOf(it) }
+    .orEmpty()
 
 fun getCliParamText(name: String, cliVersion: SemVer): String {
     val toKebabCase = cliVersion.isGreaterOrEqualThan(12, 0, 0)

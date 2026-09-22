@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-09-22
+### Added
+- Increased performance with indexes
+
 ## [0.0.8] - 2026-09-01
 ### Fixed
 - Fixed issue with the file creation

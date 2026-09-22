@@ -24,7 +24,7 @@ class NestJSDecoratorIndex : ScalarIndexExtension<String>() {
         val result = mutableMapOf<String, Void?>()
         val psi = content.psiFile
 
-        if (!content.contentAsText.contains('@')) return@DataIndexer result
+        if (!content.contentAsText.contains(NESTJS_PREFIX_PACKAGE)) return@DataIndexer result
 
         PsiTreeUtil.findChildrenOfType(psi, ES6Decorator::class.java).forEach { decorator ->
             decorator.decoratorName?.let { result[it] = null }
@@ -37,6 +37,7 @@ class NestJSDecoratorIndex : ScalarIndexExtension<String>() {
     override fun getVersion(): Int = 1
 
     companion object {
+        const val NESTJS_PREFIX_PACKAGE = "@nestjs/"
         val KEY: ID<String, Void> = ID.create("nestjs.decorator.index")
     }
 }

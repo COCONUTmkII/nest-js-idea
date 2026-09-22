@@ -14,6 +14,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValue
@@ -70,7 +71,7 @@ class NestJSModuleService {
         CachedValuesManager.getCachedValue(module) {
             CachedValueProvider.Result.create(
                 extractModuleMetadata(module).merge(extractDynamicModuleMetadata(module)),
-                module.containingFile
+                module.containingFile, PsiModificationTracker.MODIFICATION_COUNT
             )
         }
 
@@ -161,7 +162,6 @@ class NestJSModuleService {
         project: Project
     ): List<TypeScriptClass> {
         val scope = GlobalSearchScope.projectScope(project)
-        val decoratorService = project.service<NestJSDecoratorService>()
         val psiManager = PsiManager.getInstance(project)
 
         val files = FileBasedIndex.getInstance()
@@ -169,10 +169,19 @@ class NestJSModuleService {
 
         return files.flatMap { vf ->
             val psiFile = psiManager.findFile(vf) ?: return@flatMap emptyList()
-            PsiTreeUtil.findChildrenOfType(psiFile, TypeScriptClass::class.java)
-                .filter { decoratorService.findNestDecorator(it, NestJSBeanType.MODULE.normalizedName) != null }
+            nestModulesIn(psiFile)
         }
     }
+
+    private fun nestModulesIn(psiFile: PsiFile): List<TypeScriptClass> =
+        CachedValuesManager.getCachedValue(psiFile) {
+            val decoratorService = psiFile.project.service<NestJSDecoratorService>()
+            CachedValueProvider.Result.create(
+                PsiTreeUtil.findChildrenOfType(psiFile, TypeScriptClass::class.java)
+                    .filter { decoratorService.findNestDecorator(it, NestJSBeanType.MODULE.normalizedName) != null },
+                psiFile
+            )
+        }
 
     private fun resolve(
         obj: JSObjectLiteralExpression,
