@@ -1,10 +1,8 @@
 package com.coconutmkii.nestjsidea.index
 
-import com.intellij.lang.javascript.TypeScriptFileType
 import com.intellij.lang.javascript.psi.ecma6.ES6Decorator
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.indexing.DataIndexer
-import com.intellij.util.indexing.DefaultFileTypeSpecificInputFilter
 import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.indexing.FileContent
 import com.intellij.util.indexing.ID
@@ -15,8 +13,7 @@ import com.intellij.util.io.KeyDescriptor
 class NestJSDecoratorIndex : ScalarIndexExtension<String>() {
     override fun getName(): ID<String, Void> = KEY
 
-    override fun getInputFilter(): FileBasedIndex.InputFilter =
-        DefaultFileTypeSpecificInputFilter(TypeScriptFileType.INSTANCE)
+    override fun getInputFilter(): FileBasedIndex.InputFilter = typescriptInputFilter()
 
     override fun dependsOnFileContent(): Boolean = true
 
