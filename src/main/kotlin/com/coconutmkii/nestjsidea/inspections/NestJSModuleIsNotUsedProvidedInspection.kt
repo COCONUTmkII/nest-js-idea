@@ -17,7 +17,7 @@ class NestJSModuleIsNotUsedProvidedInspection : LocalInspectionTool() {
             override fun visitES6Decorator(decorator: ES6Decorator) {
                 val beanService = holder.project.service<NestJSBeanService>()
                 val decoratorService = holder.project.service<NestJSDecoratorService>()
-                if (decoratorService.isNestSupportedDecorator(decorator, NestJSBeanType.MODULE.normilizedName)) {
+                if (decoratorService.isNestSupportedDecorator(decorator, NestJSBeanType.MODULE.normalizedName)) {
                     val classOfDecorator = decoratorService.getClassForDecoratorElement(decorator) ?: return
                     val nameOfProvidedClassWithDecorator = classOfDecorator.nameIdentifier ?: return
 

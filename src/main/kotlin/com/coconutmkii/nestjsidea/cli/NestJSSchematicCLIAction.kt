@@ -116,7 +116,7 @@ class NestJSSchematicCLIAction : DumbAwareAction(nestIcon) {
             .setSettingButtons(toolbarComponent)
             .setCancelOnWindowDeactivation(false)
             .setCancelOnClickOutside(true)
-            .setDimensionServiceKey(project, "org.angular.cli.generate", true)
+            .setDimensionServiceKey(project, "nestjs.cli.generate", true)
             .setMinSize(Dimension(JBUI.scale(350), JBUI.scale(300)))
             .setCancelButton(
                 IconButton(

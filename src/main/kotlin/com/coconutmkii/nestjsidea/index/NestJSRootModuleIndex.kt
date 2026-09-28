@@ -1,0 +1,42 @@
+package com.coconutmkii.nestjsidea.index
+
+import com.intellij.lang.javascript.psi.JSCallExpression
+import com.intellij.lang.javascript.psi.JSReferenceExpression
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.indexing.DataIndexer
+import com.intellij.util.indexing.FileBasedIndex
+import com.intellij.util.indexing.FileContent
+import com.intellij.util.indexing.ID
+import com.intellij.util.indexing.ScalarIndexExtension
+import com.intellij.util.io.EnumeratorStringDescriptor
+import com.intellij.util.io.KeyDescriptor
+
+class NestJSRootModuleIndex : ScalarIndexExtension<String>() {
+    override fun getName(): ID<String, Void> = KEY
+
+    override fun getInputFilter(): FileBasedIndex.InputFilter = typescriptInputFilter()
+
+    override fun dependsOnFileContent(): Boolean = true
+
+    override fun getIndexer(): DataIndexer<String, Void, FileContent> = DataIndexer { content ->
+        if (!content.contentAsText.contains(NEST_FACTORY)) return@DataIndexer emptyMap()
+
+        val result = mutableMapOf<String, Void?>()
+        PsiTreeUtil.findChildrenOfType(content.psiFile, JSCallExpression::class.java).forEach { call ->
+            val method = call.methodExpression as? JSReferenceExpression ?: return@forEach
+            if (method.referenceName !in FACTORY_METHODS || method.qualifier?.text != NEST_FACTORY) return@forEach
+            (call.arguments.firstOrNull() as? JSReferenceExpression)?.referenceName?.let { result[it] = null }
+        }
+        result
+    }
+
+    override fun getKeyDescriptor(): KeyDescriptor<String> = EnumeratorStringDescriptor.INSTANCE
+
+    override fun getVersion(): Int = 1
+
+    companion object {
+        private const val NEST_FACTORY = "NestFactory"
+        private val FACTORY_METHODS = setOf("create", "createMicroservice", "createApplicationContext")
+        val KEY: ID<String, Void> = ID.create("nestjs.root.module.index")
+    }
+}

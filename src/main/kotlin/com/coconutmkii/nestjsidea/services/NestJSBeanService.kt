@@ -1,7 +1,7 @@
 package com.coconutmkii.nestjsidea.services
 
+import com.coconutmkii.nestjsidea.framework.model.FORWARD_REF_FUNCTION
 import com.coconutmkii.nestjsidea.framework.model.NestJSBeanType
-import com.coconutmkii.nestjsidea.framework.model.NestJSModuleProperty
 import com.coconutmkii.nestjsidea.framework.model.NestJSProviderProperty
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
 import com.intellij.lang.javascript.psi.JSCallExpression
@@ -27,7 +27,8 @@ class NestJSBeanService {
         project: Project,
         beanType: NestJSBeanType
     ): Boolean {
-        val targetClassName = clazz.name ?: return false
+        if (clazz.name == null) return false
+
         val moduleService = project.service<NestJSModuleService>()
         val allModules = moduleService.findAllNestModules(project)
 
@@ -36,10 +37,8 @@ class NestJSBeanService {
                 moduleService.isModuleUsedAnywhere(clazz, allModules)
             }
             NestJSBeanType.CONTROLLER -> {
-                val controllerService = project.service<NestJSControllerService>()
-                allModules.any { module ->
-                    controllerService.isControllerDeclared(module, targetClassName)
-                }
+                project.service<NestJSControllerService>()
+                    .isControllerUsedAnywhere(clazz, allModules)
             }
             NestJSBeanType.SERVICE -> {
                 true
@@ -104,7 +103,7 @@ class NestJSBeanService {
                         (method.qualifier as? JSReferenceExpression)?.referenceName?.let(result::add)
 
                     // [forwardRef(() => UserModule)]
-                    method?.referenceName == NestJSModuleProperty.FORWARD_REF.providerKey ->
+                    method?.referenceName == FORWARD_REF_FUNCTION ->
                         e.arguments.firstOrNull()
                             ?.let { PsiTreeUtil.findChildrenOfType(it, JSReferenceExpression::class.java) }
                             ?.forEach { ref -> ref.referenceName?.let(result::add) }

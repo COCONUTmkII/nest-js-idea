@@ -28,12 +28,15 @@ data class NestJsModuleMetadata(
     }
 }
 
-enum class NestJSModuleProperty(val providerKey: String) {
+const val DYNAMIC_MODULE_DISCRIMINATOR = "module"
+
+const val FORWARD_REF_FUNCTION = "forwardRef"
+
+enum class NestJSModuleProperty(val key: String) {
     IMPORTS("imports"),
     CONTROLLERS("controllers"),
     EXPORTS("exports"),
     PROVIDERS("providers"),
-    FORWARD_REF("forwardRef");
 }
 
 enum class NestJSProviderProperty(val key: String) {

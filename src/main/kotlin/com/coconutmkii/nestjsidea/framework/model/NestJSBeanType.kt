@@ -1,6 +1,6 @@
 package com.coconutmkii.nestjsidea.framework.model
 
-enum class NestJSBeanType(val normilizedName: String) {
+enum class NestJSBeanType(val normalizedName: String) {
     MODULE("Module"),
     CONTROLLER("Controller"),
     SERVICE("Service"),
