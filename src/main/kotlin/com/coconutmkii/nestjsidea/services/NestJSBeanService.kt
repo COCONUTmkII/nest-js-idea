@@ -40,8 +40,9 @@ class NestJSBeanService {
                 project.service<NestJSControllerService>()
                     .isControllerUsedAnywhere(clazz, allModules)
             }
-            NestJSBeanType.SERVICE -> {
-                true
+            NestJSBeanType.INJECTABLE -> {
+                project.service<NestJSInjectableService>()
+                    .isInjectedAnywhere(clazz, allModules)
             }
             NestJSBeanType.GUARD -> {
                 true
@@ -124,5 +125,39 @@ class NestJSBeanService {
                 collectElement(e.elseBranch, visited, result)
             }
         }
+    }
+
+    fun findModulesUsingBean(element: TypeScriptClass, beanType: NestJSBeanType): List<TypeScriptClass> {
+        val targetName = element.name ?: return emptyList()
+        val moduleService = element.project.service<NestJSModuleService>()
+        val allModules = moduleService.findAllNestModules(element.project)
+
+        return when (beanType) {
+            NestJSBeanType.CONTROLLER -> {
+                allModules.filter { module ->
+                    targetName in moduleService.buildModuleMetadata(module).controllers
+                }
+            }
+            NestJSBeanType.INJECTABLE -> {
+                allModules.filter { module ->
+                    targetName in moduleService.buildModuleMetadata(module).providers
+                }
+            }
+            NestJSBeanType.GUARD -> {
+                emptyList()
+            }
+            NestJSBeanType.PIPE -> {
+                emptyList()
+            }
+            NestJSBeanType.MODULE -> {
+                allModules.filter { module ->
+                    targetName in moduleService.buildModuleMetadata(module).imports
+                }
+            }
+            NestJSBeanType.RESOLVER -> {
+                emptyList()
+            }
+        }
+        
     }
 }

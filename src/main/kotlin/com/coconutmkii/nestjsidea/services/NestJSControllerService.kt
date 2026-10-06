@@ -16,9 +16,17 @@ class NestJSControllerService(private val project: Project) {
         val moduleService = project.service<NestJSModuleService>()
 
         return allModules.any { module ->
-            moduleService.buildModuleMetadata(module)
-                .controllers
-                .contains(targetName)
+            targetName in moduleService.buildModuleMetadata(module).controllers
+        }
+    }
+    
+    fun findModulesUsingController(controller: TypeScriptClass): List<TypeScriptClass> {
+        val targetName = controller.name ?: return emptyList()
+        val moduleService = project.service<NestJSModuleService>()
+        val allModules = moduleService.findAllNestModules(project)
+        
+        return allModules.filter { module ->
+           targetName in moduleService.buildModuleMetadata(module).controllers
         }
     }
 }

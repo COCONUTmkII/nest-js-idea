@@ -10,6 +10,9 @@
 
     <resource-bundle>messages.NestJSBundle</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="TypeScript" implementationClass="com.coconutmkii.nestjsidea.marker.NestJSControllerLineMarker"/>
+        <codeInsight.lineMarkerProvider language="TypeScript" implementationClass="com.coconutmkii.nestjsidea.marker.NestJSInjectableLineMarker"/>
+        <codeInsight.lineMarkerProvider language="TypeScript" implementationClass="com.coconutmkii.nestjsidea.marker.NestJSModuleLineMarker"/>
         <fileType name="JSON" language="JSON" fileNames="nest-cli.json"/>
         <directoryProjectGenerator implementation="com.coconutmkii.nestjsidea.window.NestJSProjectGenerator"/>
         <framework.detector implementation="com.coconutmkii.nestjsidea.framework.NestJSFrameworkDetector"/>
@@ -34,10 +37,14 @@
                          key="nestjs.inspection.controller.is.not.provided"
         />
         <localInspection language="TypeScript"
-                         implementationClass="com.coconutmkii.nestjsidea.inspections.NestJSModuleIsNotUsedProvidedInspection"
+                         implementationClass="com.coconutmkii.nestjsidea.inspections.NestJSModuleIsNotProvidedInspection"
                          level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"
                          key="nestjs.inspection.module.is.not.used"
         />
+        <localInspection language="TypeScript"
+                         implementationClass="com.coconutmkii.nestjsidea.inspections.NestJSInjectableIsNotProvidedInspection"
+                         level="WARNING" enabledByDefault="true" groupKey="nestjs.inspection.group.name"
+                         key="nestjs.inspection.injectable.is.not.used"/>
         <fileBasedIndex implementation="com.coconutmkii.nestjsidea.index.NestJSDecoratorIndex"/>
         <fileBasedIndex implementation="com.coconutmkii.nestjsidea.index.NestJSRootModuleIndex"/>
     </extensions>

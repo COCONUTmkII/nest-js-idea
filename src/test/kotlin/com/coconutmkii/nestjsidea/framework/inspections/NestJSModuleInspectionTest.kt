@@ -1,11 +1,11 @@
 package com.coconutmkii.nestjsidea.framework.inspections
 
-import com.coconutmkii.nestjsidea.inspections.NestJSModuleIsNotUsedProvidedInspection
+import com.coconutmkii.nestjsidea.inspections.NestJSModuleIsNotProvidedInspection
 
 class NestJSModuleInspectionTest : NestJSInspectionsTestBase() {
     override fun setUp() {
         super.setUp()
-        enable(arrayOf(NestJSModuleIsNotUsedProvidedInspection()))
+        enable(arrayOf(NestJSModuleIsNotProvidedInspection()))
     }
 
     fun `test plain import is not reported`() {

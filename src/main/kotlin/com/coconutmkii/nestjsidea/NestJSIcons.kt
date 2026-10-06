@@ -11,4 +11,5 @@ object NestJSIcons {
     val guardIcon: Icon = IconLoader.getIcon("/icons/guardIcon.svg", javaClass)
     val resolverIcon: Icon = IconLoader.getIcon("/icons/resolverIcon.svg", javaClass)
     val nestIcon: Icon = IconLoader.getIcon("/icons/nestjsIcon.png", javaClass)
+    val beanIcon: Icon = IconLoader.getIcon("/icons/showAutowiredDependencies@14x14.svg", javaClass)
 }
